@@ -1,0 +1,19 @@
+Subject: Alerta de Mail Health: {BOUNCES_TOTAL} rebotes en 24 horas
+
+Hola:
+
+Mail Health en {SITENAME} ha recibido {BOUNCES_TOTAL} avisos de no entrega en las últimas 24 horas, por encima del umbral de alerta de {ALERT_LIMIT}.
+
+Rebotes definitivos (la dirección no existe): {BOUNCES_HARD}
+Rebotes temporales: {BOUNCES_SOFT}
+
+Un aumento repentino suele apuntar a un problema de envío más que a muchas direcciones muertas a la vez: la IP del servidor en una lista negra, un registro SPF o DKIM roto, o un boletín enviado a una lista vieja.
+
+El registro de rebotes muestra los detalles:
+{U_ACP}
+
+La pestaña Revisión puede comprobar los registros DNS de tu dominio.
+
+No recibirás otra alerta durante las próximas 24 horas.
+
+{EMAIL_SIG}

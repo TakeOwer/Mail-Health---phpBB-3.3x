@@ -1,0 +1,15 @@
+Subject: Bitte bestätige deine E-Mail-Adresse
+
+Hallo {USERNAME},
+
+du hast die E-Mail-Adresse deines Kontos auf {SITENAME} geändert, nachdem die vorherige keine Nachrichten mehr angenommen hat.
+
+Diese Nachricht ist die Probe: wenn du sie liest, funktioniert die neue Adresse. Klicke auf den Link unten, um sie sofort zu bestätigen:
+
+{U_CONFIRM}
+
+Wenn du nichts tust, wird die Adresse nach {CONFIRM_DAYS} Tagen ohne Probleme von selbst bestätigt.
+
+Wenn du nichts geändert hast, ignoriere diese Nachricht.
+
+{EMAIL_SIG}

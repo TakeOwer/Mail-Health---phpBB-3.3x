@@ -1,0 +1,252 @@
+<!-- INCLUDE overall_header.html -->
+
+<a id="maincontent"></a>
+
+<style>
+.mh-info { background: #F4F7FB; border: 1px solid #C7D2E0; border-left: 4px solid #3A6EA5; border-radius: 4px; padding: 8px 12px; margin: 10px 0; color: #28313F; text-align: left; }
+.mh-info p { margin: 0; }
+</style>
+
+<h1>{L_ACP_MAILHEALTH_SETTINGS}</h1>
+<!-- INCLUDE acp_mailhealth_badges.html -->
+<p>{L_MAILHEALTH_SETTINGS_EXPLAIN}</p>
+
+<!-- IF not S_IMAP_AVAILABLE -->
+	<div class="errorbox">
+		<p>{L_MAILHEALTH_NO_TRANSPORT}</p>
+	</div>
+<!-- ENDIF -->
+
+<!-- IF not S_CRYPTO_AVAILABLE -->
+	<div class="errorbox">
+		<p>{L_MAILHEALTH_CRYPTO_UNAVAILABLE}</p>
+	</div>
+<!-- ELSE -->
+	<div class="successbox">
+		<p>
+			{{ lang('MAILHEALTH_CRYPTO_STATUS', MAILHEALTH_CIPHER) }}
+			<!-- IF S_KEY_IN_CONFIG -->
+				{L_MAILHEALTH_KEY_IN_CONFIG}
+			<!-- ELSEIF S_KEY_EXISTS -->
+				{{ lang('MAILHEALTH_KEY_IN_STORE', MAILHEALTH_KEY_PATH) }}
+			<!-- ELSE -->
+				{L_MAILHEALTH_KEY_PENDING}
+			<!-- ENDIF -->
+		</p>
+	</div>
+<!-- ENDIF -->
+
+<!-- IF S_NEWSLETTER_DISABLED -->
+	<div class="mh-info">
+		<p>{L_MAILHEALTH_CHECK_NEWSLETTER_DISABLED_HINT}</p>
+	</div>
+<!-- ELSEIF S_NEWSLETTER_MISSING -->
+	<div class="successbox">
+		<p>{L_MAILHEALTH_CHECK_NEWSLETTER_MISSING_HINT}</p>
+	</div>
+<!-- ELSEIF S_NEWSLETTER_ENABLED -->
+	<div class="successbox">
+		<p>{{ lang('MAILHEALTH_NEWSLETTER_LINKED', MAILHEALTH_BLOCKED_COUNT) }}</p>
+	</div>
+<!-- ENDIF -->
+
+<!-- IF S_PASS_PLAINTEXT -->
+	<div class="errorbox">
+		<p>{L_MAILHEALTH_PASS_PLAINTEXT}</p>
+	</div>
+<!-- ENDIF -->
+
+<form id="mailhealth_settings" method="post" action="{U_ACTION}">
+
+<fieldset>
+	<legend>{L_MAILHEALTH_MAILBOX}</legend>
+	<dl>
+		<dt><label for="mailhealth_enabled">{L_MAILHEALTH_ENABLE}{L_COLON}</label></dt>
+		<dd>
+			<label><input type="radio" id="mailhealth_enabled" name="mailhealth_enabled" class="radio" value="1"<!-- IF MAILHEALTH_ENABLED --> checked="checked"<!-- ENDIF --> /> {L_YES}</label>
+			<label><input type="radio" name="mailhealth_enabled" class="radio" value="0"<!-- IF not MAILHEALTH_ENABLED --> checked="checked"<!-- ENDIF --> /> {L_NO}</label>
+		</dd>
+	</dl>
+	<dl>
+		<dt><label for="mailhealth_imap_transport">{L_MAILHEALTH_IMAP_TRANSPORT}{L_COLON}</label><br /><span>{L_MAILHEALTH_IMAP_TRANSPORT_EXPLAIN}</span></dt>
+		<dd>
+			<select id="mailhealth_imap_transport" name="mailhealth_imap_transport">
+				<option value="0"<!-- IF MAILHEALTH_IMAP_TRANSPORT == 0 --> selected="selected"<!-- ENDIF -->>{L_MAILHEALTH_TRANSPORT_AUTO}</option>
+				<option value="1"<!-- IF MAILHEALTH_IMAP_TRANSPORT == 1 --> selected="selected"<!-- ENDIF --><!-- IF not S_IMAP_EXT --> disabled="disabled"<!-- ENDIF -->>{L_MAILHEALTH_TRANSPORT_EXT}<!-- IF not S_IMAP_EXT --> ({L_MAILHEALTH_CHECK_MISSING})<!-- ENDIF --></option>
+				<option value="2"<!-- IF MAILHEALTH_IMAP_TRANSPORT == 2 --> selected="selected"<!-- ENDIF -->>{L_MAILHEALTH_TRANSPORT_NATIVE}</option>
+			</select>
+			<!-- IF MAILHEALTH_TRANSPORT_NAME --><br /><span class="small">{L_MAILHEALTH_TRANSPORT_IN_USE}{L_COLON} <strong><!-- IF MAILHEALTH_TRANSPORT_NAME == 'socket' -->{L_MAILHEALTH_TRANSPORT_NATIVE}<!-- ELSE -->{L_MAILHEALTH_TRANSPORT_EXT}<!-- ENDIF --></strong></span><!-- ENDIF -->
+		</dd>
+	</dl>
+	<dl>
+		<dt><label for="mailhealth_imap_host">{L_MAILHEALTH_IMAP_HOST}{L_COLON}</label></dt>
+		<dd><input type="text" id="mailhealth_imap_host" name="mailhealth_imap_host" value="{MAILHEALTH_IMAP_HOST}" maxlength="255" /></dd>
+	</dl>
+	<dl>
+		<dt><label for="mailhealth_imap_port">{L_MAILHEALTH_IMAP_PORT}{L_COLON}</label></dt>
+		<dd><input type="number" id="mailhealth_imap_port" name="mailhealth_imap_port" value="{MAILHEALTH_IMAP_PORT}" min="1" max="65535" /></dd>
+	</dl>
+	<dl>
+		<dt><label for="mailhealth_imap_security">{L_MAILHEALTH_IMAP_SECURITY}{L_COLON}</label><br /><span>{L_MAILHEALTH_IMAP_SECURITY_EXPLAIN}</span></dt>
+		<dd>
+			<select id="mailhealth_imap_security" name="mailhealth_imap_security">
+				<option value="1" data-port="993"<!-- IF MAILHEALTH_IMAP_SECURITY == 1 --> selected="selected"<!-- ENDIF -->>{L_MAILHEALTH_SECURITY_1} &middot; {L_MAILHEALTH_PORT} 993</option>
+				<option value="2" data-port="143"<!-- IF MAILHEALTH_IMAP_SECURITY == 2 --> selected="selected"<!-- ENDIF -->>{L_MAILHEALTH_SECURITY_2} &middot; {L_MAILHEALTH_PORT} 143</option>
+				<option value="0" data-port="143"<!-- IF MAILHEALTH_IMAP_SECURITY == 0 --> selected="selected"<!-- ENDIF -->>{L_MAILHEALTH_SECURITY_0} &middot; {L_MAILHEALTH_PORT} 143</option>
+			</select>
+		</dd>
+	</dl>
+	<dl>
+		<dt><label for="mailhealth_imap_folder">{L_MAILHEALTH_IMAP_FOLDER}{L_COLON}</label></dt>
+		<dd><input type="text" id="mailhealth_imap_folder" name="mailhealth_imap_folder" value="{MAILHEALTH_IMAP_FOLDER}" maxlength="100" /></dd>
+	</dl>
+	<dl>
+		<dt><label for="mailhealth_imap_user">{L_MAILHEALTH_IMAP_USER}{L_COLON}</label></dt>
+		<dd><input type="text" id="mailhealth_imap_user" name="mailhealth_imap_user" value="{MAILHEALTH_IMAP_USER}" maxlength="255" autocomplete="off" /></dd>
+	</dl>
+	<dl>
+		<dt><label for="mailhealth_imap_pass">{L_MAILHEALTH_IMAP_PASS}{L_COLON}</label><br /><span>{L_MAILHEALTH_IMAP_PASS_EXPLAIN}</span></dt>
+		<dd>
+			<input type="password" id="mailhealth_imap_pass" name="mailhealth_imap_pass" value="" maxlength="255" autocomplete="new-password" />
+			<!-- IF S_PASS_STORED --><br /><span class="small">{L_MAILHEALTH_PASS_STORED}</span><!-- ENDIF -->
+		</dd>
+	</dl>
+	<!-- IF S_PASS_STORED -->
+	<dl>
+		<dt><label for="mailhealth_clear_pass">{L_MAILHEALTH_CLEAR_PASS}{L_COLON}</label><br /><span>{L_MAILHEALTH_CLEAR_PASS_EXPLAIN}</span></dt>
+		<dd><input type="checkbox" id="mailhealth_clear_pass" name="mailhealth_clear_pass" class="checkbox" value="1" /></dd>
+	</dl>
+	<!-- ENDIF -->
+	<dl>
+		<dt><label for="mailhealth_imap_delete">{L_MAILHEALTH_IMAP_DELETE}{L_COLON}</label></dt>
+		<dd>
+			<label><input type="radio" id="mailhealth_imap_delete" name="mailhealth_imap_delete" class="radio" value="1"<!-- IF MAILHEALTH_IMAP_DELETE --> checked="checked"<!-- ENDIF --> /> {L_YES}</label>
+			<label><input type="radio" name="mailhealth_imap_delete" class="radio" value="0"<!-- IF not MAILHEALTH_IMAP_DELETE --> checked="checked"<!-- ENDIF --> /> {L_NO}</label>
+		</dd>
+	</dl>
+	<dl>
+		<dt><label for="mailhealth_batch_size">{L_MAILHEALTH_BATCH_SIZE}{L_COLON}</label></dt>
+		<dd><input type="number" id="mailhealth_batch_size" name="mailhealth_batch_size" value="{MAILHEALTH_BATCH_SIZE}" min="1" max="1000" /></dd>
+	</dl>
+</fieldset>
+
+<fieldset>
+	<legend>{L_MAILHEALTH_RULES}</legend>
+	<dl>
+		<dt><label for="mailhealth_hard_limit">{L_MAILHEALTH_HARD_LIMIT}{L_COLON}</label><br /><span>{L_MAILHEALTH_HARD_LIMIT_EXPLAIN}</span></dt>
+		<dd><input type="number" id="mailhealth_hard_limit" name="mailhealth_hard_limit" value="{MAILHEALTH_HARD_LIMIT}" min="1" max="99" /></dd>
+	</dl>
+	<dl>
+		<dt><label for="mailhealth_soft_limit">{L_MAILHEALTH_SOFT_LIMIT}{L_COLON}</label><br /><span>{L_MAILHEALTH_SOFT_LIMIT_EXPLAIN}</span></dt>
+		<dd><input type="number" id="mailhealth_soft_limit" name="mailhealth_soft_limit" value="{MAILHEALTH_SOFT_LIMIT}" min="1" max="99" /></dd>
+	</dl>
+	<dl>
+		<dt><label for="mailhealth_record_period">{L_MAILHEALTH_RECORD_PERIOD}{L_COLON}</label><br /><span>{L_MAILHEALTH_RECORD_PERIOD_EXPLAIN}</span></dt>
+		<dd><input type="number" id="mailhealth_record_period" name="mailhealth_record_period" value="{MAILHEALTH_RECORD_PERIOD}" min="1" max="3650" /></dd>
+	</dl>
+	<dl>
+		<dt><label for="mailhealth_confirm_days">{L_MAILHEALTH_CONFIRM_DAYS}{L_COLON}</label><br /><span>{L_MAILHEALTH_CONFIRM_DAYS_EXPLAIN}</span></dt>
+		<dd><input type="number" id="mailhealth_confirm_days" name="mailhealth_confirm_days" value="{MAILHEALTH_CONFIRM_DAYS}" min="1" max="365" /></dd>
+	</dl>
+	<dl>
+		<dt><label for="mailhealth_action">{L_MAILHEALTH_ACTION}{L_COLON}</label></dt>
+		<dd>
+			<select id="mailhealth_action" name="mailhealth_action">
+				<option value="0"<!-- IF MAILHEALTH_ACTION == 0 --> selected="selected"<!-- ENDIF -->>{L_MAILHEALTH_ACTION_0}</option>
+				<option value="1"<!-- IF MAILHEALTH_ACTION == 1 --> selected="selected"<!-- ENDIF -->>{L_MAILHEALTH_ACTION_1}</option>
+				<option value="2"<!-- IF MAILHEALTH_ACTION == 2 --> selected="selected"<!-- ENDIF -->>{L_MAILHEALTH_ACTION_2}</option>
+			</select>
+		</dd>
+	</dl>
+	<dl>
+		<dt><label for="mailhealth_notify_admin">{L_MAILHEALTH_NOTIFY_ADMIN}{L_COLON}</label></dt>
+		<dd>
+			<label><input type="radio" id="mailhealth_notify_admin" name="mailhealth_notify_admin" class="radio" value="1"<!-- IF MAILHEALTH_NOTIFY_ADMIN --> checked="checked"<!-- ENDIF --> /> {L_YES}</label>
+			<label><input type="radio" name="mailhealth_notify_admin" class="radio" value="0"<!-- IF not MAILHEALTH_NOTIFY_ADMIN --> checked="checked"<!-- ENDIF --> /> {L_NO}</label>
+		</dd>
+	</dl>
+</fieldset>
+
+<fieldset>
+	<legend>{L_MAILHEALTH_MEMBERS}</legend>
+	<dl>
+		<dt><label for="mailhealth_pm_enabled">{L_MAILHEALTH_PM_ENABLED}{L_COLON}</label><br /><span>{L_MAILHEALTH_PM_ENABLED_EXPLAIN}</span></dt>
+		<dd>
+			<label><input type="radio" id="mailhealth_pm_enabled" name="mailhealth_pm_enabled" class="radio" value="1"<!-- IF MAILHEALTH_PM_ENABLED --> checked="checked"<!-- ENDIF --> /> {L_YES}</label>
+			<label><input type="radio" name="mailhealth_pm_enabled" class="radio" value="0"<!-- IF not MAILHEALTH_PM_ENABLED --> checked="checked"<!-- ENDIF --> /> {L_NO}</label>
+		</dd>
+	</dl>
+	<dl>
+		<dt><label for="mailhealth_pm_sender_name">{L_MAILHEALTH_PM_SENDER}{L_COLON}</label><br /><span>{L_MAILHEALTH_PM_SENDER_EXPLAIN}</span></dt>
+		<dd><input type="text" id="mailhealth_pm_sender_name" name="mailhealth_pm_sender_name" value="{MAILHEALTH_PM_SENDER_NAME}" maxlength="255" /></dd>
+	</dl>
+	<dl>
+		<dt><label for="mailhealth_verify_enabled">{L_MAILHEALTH_VERIFY_ENABLED}{L_COLON}</label><br /><span>{L_MAILHEALTH_VERIFY_ENABLED_EXPLAIN}</span></dt>
+		<dd>
+			<label><input type="radio" id="mailhealth_verify_enabled" name="mailhealth_verify_enabled" class="radio" value="1"<!-- IF MAILHEALTH_VERIFY_ENABLED --> checked="checked"<!-- ENDIF --> /> {L_YES}</label>
+			<label><input type="radio" name="mailhealth_verify_enabled" class="radio" value="0"<!-- IF not MAILHEALTH_VERIFY_ENABLED --> checked="checked"<!-- ENDIF --> /> {L_NO}</label>
+		</dd>
+	</dl>
+</fieldset>
+
+<fieldset>
+	<legend>{L_MAILHEALTH_ALERTS}</legend>
+	<dl>
+		<dt><label for="mailhealth_alert_limit">{L_MAILHEALTH_ALERT_LIMIT}{L_COLON}</label><br /><span>{L_MAILHEALTH_ALERT_LIMIT_EXPLAIN}</span></dt>
+		<dd><input type="number" id="mailhealth_alert_limit" name="mailhealth_alert_limit" value="{MAILHEALTH_ALERT_LIMIT}" min="0" max="100000" /></dd>
+	</dl>
+	<dl>
+		<dt><label for="mailhealth_alert_email">{L_MAILHEALTH_ALERT_EMAIL}{L_COLON}</label><br /><span>{{ lang('MAILHEALTH_ALERT_EMAIL_EXPLAIN', MAILHEALTH_BOARD_CONTACT) }}</span></dt>
+		<dd>
+			<label><input type="radio" id="mailhealth_alert_email" name="mailhealth_alert_email" class="radio" value="1"<!-- IF MAILHEALTH_ALERT_EMAIL --> checked="checked"<!-- ENDIF --> /> {L_YES}</label>
+			<label><input type="radio" name="mailhealth_alert_email" class="radio" value="0"<!-- IF not MAILHEALTH_ALERT_EMAIL --> checked="checked"<!-- ENDIF --> /> {L_NO}</label>
+		</dd>
+	</dl>
+</fieldset>
+
+<fieldset>
+	<legend>{L_MAILHEALTH_DNS}</legend>
+	<p class="small">{L_MAILHEALTH_DNS_EXPLAIN}</p>
+	<dl>
+		<dt><label for="mailhealth_dkim_selector">{L_MAILHEALTH_DKIM_SELECTOR}{L_COLON}</label><br /><span>{L_MAILHEALTH_DKIM_SELECTOR_EXPLAIN}</span></dt>
+		<dd><input type="text" id="mailhealth_dkim_selector" name="mailhealth_dkim_selector" value="{MAILHEALTH_DKIM_SELECTOR}" maxlength="63" /></dd>
+	</dl>
+</fieldset>
+
+<fieldset>
+	<legend>{L_MAILHEALTH_CRON}</legend>
+	<dl>
+		<dt><label for="mailhealth_cron_interval">{L_MAILHEALTH_CRON_INTERVAL}{L_COLON}</label></dt>
+		<dd><input type="number" id="mailhealth_cron_interval" name="mailhealth_cron_interval" value="{MAILHEALTH_CRON_INTERVAL}" min="60" max="86400" /></dd>
+	</dl>
+	<dl>
+		<dt><label>{L_MAILHEALTH_LAST_RUN}{L_COLON}</label></dt>
+		<dd><strong>{MAILHEALTH_LAST_RUN}</strong></dd>
+	</dl>
+</fieldset>
+
+<script>
+(function () {
+	var security = document.getElementById('mailhealth_imap_security');
+	var port = document.getElementById('mailhealth_imap_port');
+	if (!security || !port) { return; }
+	// Only standard ports are replaced: a custom port typed by hand stays.
+	security.addEventListener('change', function () {
+		var wanted = security.options[security.selectedIndex].getAttribute('data-port');
+		if (port.value === '' || port.value === '993' || port.value === '143') { port.value = wanted; }
+	});
+})();
+</script>
+
+<fieldset class="submit-buttons">
+	<legend>{L_SUBMIT}</legend>
+	<input class="button1" type="submit" id="submit" name="submit" value="{L_SUBMIT}" />
+	<input class="button2" type="submit" id="test_connection" name="test_connection" value="{L_MAILHEALTH_TEST}" />
+	<input class="button2" type="submit" id="detect_settings" name="detect_settings" value="{L_MAILHEALTH_DETECT}" title="{L_MAILHEALTH_DETECT_EXPLAIN}" />
+	<input class="button2" type="reset" value="{L_RESET}" name="reset" />
+	{S_FORM_TOKEN}
+</fieldset>
+
+</form>
+
+<!-- INCLUDE overall_footer.html -->

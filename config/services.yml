@@ -1,0 +1,98 @@
+services:
+    salvocortesiano.mailhealth.dsn_parser:
+        class: salvocortesiano\mailhealth\service\dsn_parser
+
+    salvocortesiano.mailhealth.crypto:
+        class: salvocortesiano\mailhealth\service\crypto
+        arguments:
+            - '%core.root_path%'
+            - '%core.php_ext%'
+
+    salvocortesiano.mailhealth.imap_client:
+        class: salvocortesiano\mailhealth\service\imap_client
+        arguments:
+            - '@config'
+            - '@salvocortesiano.mailhealth.crypto'
+
+    salvocortesiano.mailhealth.integration:
+        class: salvocortesiano\mailhealth\service\integration
+        arguments:
+            - '@ext.manager'
+            - '@salvocortesiano.mailhealth.manager'
+
+    salvocortesiano.mailhealth.diagnostics:
+        class: salvocortesiano\mailhealth\service\diagnostics
+        arguments:
+            - '@config'
+            - '@dbal.conn'
+            - '@dbal.tools'
+            - '@language'
+            - '@salvocortesiano.mailhealth.crypto'
+            - '@salvocortesiano.mailhealth.imap_client'
+            - '@salvocortesiano.mailhealth.dsn_parser'
+            - '@salvocortesiano.mailhealth.integration'
+            - '%salvocortesiano.mailhealth.table.bounces%'
+            - '%salvocortesiano.mailhealth.table.suppress%'
+            - '%salvocortesiano.mailhealth.table.users%'
+
+    salvocortesiano.mailhealth.notifier:
+        class: salvocortesiano\mailhealth\service\notifier
+        arguments:
+            - '@config'
+            - '@dbal.conn'
+            - '@language'
+            - '@language.loader'
+            - '@routing.helper'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+
+    salvocortesiano.mailhealth.controller.confirm:
+        class: salvocortesiano\mailhealth\controller\confirm
+        arguments:
+            - '@controller.helper'
+            - '@language'
+            - '@salvocortesiano.mailhealth.manager'
+
+    salvocortesiano.mailhealth.manager:
+        class: salvocortesiano\mailhealth\service\manager
+        arguments:
+            - '@config'
+            - '@dbal.conn'
+            - '@user'
+            - '@log'
+            - '@salvocortesiano.mailhealth.notifier'
+            - '%salvocortesiano.mailhealth.table.bounces%'
+            - '%salvocortesiano.mailhealth.table.suppress%'
+            - '%salvocortesiano.mailhealth.table.users%'
+            - '%core.root_path%'
+            - '%core.php_ext%'
+
+    salvocortesiano.mailhealth.dns_check:
+        class: salvocortesiano\mailhealth\service\dns_check
+        arguments:
+            - '@config'
+
+    salvocortesiano.mailhealth.cron.fetch_bounces:
+        class: salvocortesiano\mailhealth\cron\task\fetch_bounces
+        arguments:
+            - '@config'
+            - '@salvocortesiano.mailhealth.imap_client'
+            - '@salvocortesiano.mailhealth.dsn_parser'
+            - '@salvocortesiano.mailhealth.manager'
+        calls:
+            - [set_name, [salvocortesiano.mailhealth.cron.fetch_bounces]]
+        tags:
+            - { name: cron.task }
+
+    salvocortesiano.mailhealth.listener:
+        class: salvocortesiano\mailhealth\event\listener
+        arguments:
+            - '@template'
+            - '@salvocortesiano.mailhealth.manager'
+        tags:
+            - { name: event.listener }
+
+parameters:
+    salvocortesiano.mailhealth.table.bounces: '%core.table_prefix%mailhealth_bounces'
+    salvocortesiano.mailhealth.table.suppress: '%core.table_prefix%mailhealth_suppress'
+    salvocortesiano.mailhealth.table.users: '%core.table_prefix%mailhealth_users'

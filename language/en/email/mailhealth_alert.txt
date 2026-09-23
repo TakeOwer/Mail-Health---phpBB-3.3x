@@ -1,0 +1,19 @@
+Subject: Mail Health alert: {BOUNCES_TOTAL} bounces in 24 hours
+
+Hello {USERNAME},
+
+Mail Health on {SITENAME} received {BOUNCES_TOTAL} delivery failure reports in the last 24 hours, above the alert threshold of {ALERT_LIMIT}.
+
+Hard bounces (address does not exist): {BOUNCES_HARD}
+Soft bounces (temporary failures): {BOUNCES_SOFT}
+
+A sudden rise usually points to a sending problem rather than to many dead addresses at once: the server's IP on a blacklist, a broken SPF or DKIM record, or a newsletter sent to an old list.
+
+The bounce log shows the details:
+{U_ACP}
+
+The check-up tab can verify the DNS records of your domain.
+
+You will not receive another alert for the next 24 hours.
+
+{EMAIL_SIG}

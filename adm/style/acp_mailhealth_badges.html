@@ -1,0 +1,16 @@
+<style>
+.mh-badges { display: flex; flex-wrap: wrap; gap: 10px; margin: 6px 0 14px; }
+.mh-badge { display: inline-flex; border-radius: 3px; overflow: hidden; font: bold 11px/1 Verdana, "DejaVu Sans", sans-serif; color: #FFF; box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15); }
+.mh-badge span { padding: 6px 8px; }
+.mh-badge .mh-badge-label { background: #555; font-weight: normal; }
+.mh-badge .mh-badge-blue { background: #2F6CA3; }
+.mh-badge .mh-badge-green { background: #3C8B3C; }
+.mh-badge .mh-badge-red { background: #BC2A4D; }
+.mh-badge .mh-badge-grey { background: #8A8A8A; }
+</style>
+<div class="mh-badges">
+	<span class="mh-badge" title="{L_MAILHEALTH_BADGE_VERSION_TITLE}"><span class="mh-badge-label">{L_MAILHEALTH_BADGE_VERSION}</span><span class="mh-badge-blue">{MAILHEALTH_BADGE_VERSION}</span></span>
+	<span class="mh-badge" title="<!-- IF S_MAILHEALTH_PHPBB_OK -->{L_MAILHEALTH_BADGE_COMPATIBLE}<!-- ELSE -->{L_MAILHEALTH_BADGE_INCOMPATIBLE}<!-- ENDIF -->"><span class="mh-badge-label">phpBB</span><span class="<!-- IF S_MAILHEALTH_PHPBB_OK -->mh-badge-green<!-- ELSE -->mh-badge-red<!-- ENDIF -->">{MAILHEALTH_BADGE_PHPBB}</span></span>
+	<span class="mh-badge" title="<!-- IF S_MAILHEALTH_PHP_OK -->{L_MAILHEALTH_BADGE_COMPATIBLE}<!-- ELSE -->{L_MAILHEALTH_BADGE_INCOMPATIBLE}<!-- ENDIF -->"><span class="mh-badge-label">PHP</span><span class="<!-- IF S_MAILHEALTH_PHP_OK -->mh-badge-green<!-- ELSE -->mh-badge-red<!-- ENDIF -->">{MAILHEALTH_BADGE_PHP}</span></span>
+	<span class="mh-badge"><span class="mh-badge-label">{L_MAILHEALTH_BADGE_LICENSE}</span><span class="mh-badge-grey">{MAILHEALTH_BADGE_LICENSE}</span></span>
+</div>

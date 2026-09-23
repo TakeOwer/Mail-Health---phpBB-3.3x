@@ -1,0 +1,6 @@
+salvocortesiano_mailhealth_confirm:
+    path: /mailhealth/confirm/{user_id}/{token}
+    defaults: { _controller: salvocortesiano.mailhealth.controller.confirm:handle }
+    requirements:
+        user_id: \d+
+        token: '[a-f0-9]{32}'

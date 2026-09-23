@@ -1,0 +1,15 @@
+Subject: Conferma il tuo indirizzo e-mail
+
+Ciao {USERNAME},
+
+Hai cambiato l'indirizzo e-mail del tuo account su {SITENAME}, dopo che il precedente aveva smesso di accettare messaggi.
+
+Questo messaggio è la verifica: se lo stai leggendo, il nuovo indirizzo funziona. Fai clic sul link qui sotto per confermarlo subito:
+
+{U_CONFIRM}
+
+Se non fai nulla, l'indirizzo viene confermato da solo dopo {CONFIRM_DAYS} giorni senza problemi.
+
+Se non hai cambiato nulla, ignora questo messaggio.
+
+{EMAIL_SIG}

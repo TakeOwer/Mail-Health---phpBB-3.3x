@@ -1,0 +1,19 @@
+Subject: Alerte Mail Health : {BOUNCES_TOTAL} retours en 24 heures
+
+Bonjour,
+
+Mail Health sur {SITENAME} a reçu {BOUNCES_TOTAL} avis de non-remise au cours des 24 dernières heures, au-delà du seuil d'alerte de {ALERT_LIMIT}.
+
+Retours définitifs (adresse inexistante) : {BOUNCES_HARD}
+Retours temporaires : {BOUNCES_SOFT}
+
+Une hausse soudaine indique en général un problème d'envoi plutôt que beaucoup d'adresses mortes d'un coup : l'IP du serveur sur une liste noire, un enregistrement SPF ou DKIM cassé, ou une newsletter envoyée à une vieille liste.
+
+Le journal des retours montre le détail :
+{U_ACP}
+
+L'onglet Bilan peut vérifier les enregistrements DNS de votre domaine.
+
+Vous ne recevrez pas d'autre alerte pendant les 24 prochaines heures.
+
+{EMAIL_SIG}

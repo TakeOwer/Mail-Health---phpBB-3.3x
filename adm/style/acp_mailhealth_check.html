@@ -1,0 +1,98 @@
+<!-- INCLUDE overall_header.html -->
+
+<a id="maincontent"></a>
+
+<style>
+.mh-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
+.mh-scroll > table { min-width: 560px; }
+.mh-warn { background: #FFF8E6; border: 1px solid #F0D48A; border-left: 4px solid #C7860C; border-radius: 4px; padding: 8px 12px; margin: 10px 0; color: #4A3A12; text-align: left; }
+.mh-warn p { margin: 0; }
+</style>
+
+<h1>{L_ACP_MAILHEALTH_CHECK}</h1>
+<!-- INCLUDE acp_mailhealth_badges.html -->
+<p>{L_MAILHEALTH_CHECK_EXPLAIN}</p>
+
+<!-- IF CHECK_FAIL > 0 -->
+	<div class="errorbox"><p>{{ lang('MAILHEALTH_CHECK_SUMMARY_FAIL', CHECK_FAIL, CHECK_WARN) }}</p></div>
+<!-- ELSEIF CHECK_WARN > 0 -->
+	<div class="mh-warn"><p>{{ lang('MAILHEALTH_CHECK_SUMMARY_WARN', CHECK_WARN) }}</p></div>
+<!-- ELSE -->
+	<div class="successbox"><p>{{ lang('MAILHEALTH_CHECK_SUMMARY_OK', CHECK_OK) }}</p></div>
+<!-- ENDIF -->
+
+<!-- IF S_TEST_RUN -->
+	<div class="<!-- IF S_TEST_OK -->successbox<!-- ELSE -->errorbox<!-- ENDIF -->">
+		<p><strong>{L_MAILHEALTH_TEST}{L_COLON}</strong> {TEST_DETAIL}</p>
+	</div>
+<!-- ENDIF -->
+
+<form id="mailhealth_check" method="post" action="{U_ACTION}">
+
+<!-- IF S_DNS_RUN -->
+<fieldset>
+	<legend>{L_MAILHEALTH_CHECK_GROUP_DNS}<!-- IF DNS_DOMAIN --> &middot; {DNS_DOMAIN}<!-- ENDIF --></legend>
+	<p class="small">{L_MAILHEALTH_DNS_EXPLAIN}</p>
+	<div class="mh-scroll">
+	<table class="table1">
+	<tbody>
+	<!-- BEGIN dns -->
+		<tr class="<!-- IF dns.S_ROW_COUNT is even -->bg1<!-- ELSE -->bg2<!-- ENDIF -->">
+			<td style="width: 30%;"><strong>{dns.LABEL}</strong></td>
+			<td style="width: 12%;">
+				<!-- IF dns.S_OK --><span style="color: #228B22;">&#10004; {L_MAILHEALTH_CHECK_OK}</span><!-- ENDIF -->
+				<!-- IF dns.S_WARN --><span style="color: #C7860C;">&#9888; {L_MAILHEALTH_CHECK_WARN}</span><!-- ENDIF -->
+				<!-- IF dns.S_FAIL --><span style="color: #BC2A4D;">&#10006; {L_MAILHEALTH_CHECK_FAIL}</span><!-- ENDIF -->
+			</td>
+			<td>
+				<code style="word-break: break-all;">{dns.DETAIL}</code>
+				<!-- IF dns.HINT --><br /><span class="small">{dns.HINT}</span><!-- ENDIF -->
+			</td>
+		</tr>
+	<!-- END dns -->
+	</tbody>
+	</table>
+	</div>
+</fieldset>
+<!-- ENDIF -->
+
+<!-- BEGIN checkgroup -->
+<fieldset>
+	<legend>{checkgroup.NAME}</legend>
+	<div class="mh-scroll">
+	<table class="table1">
+	<tbody>
+	<!-- BEGIN item -->
+		<tr class="<!-- IF checkgroup.item.S_ROW_COUNT is even -->bg1<!-- ELSE -->bg2<!-- ENDIF -->">
+			<td style="width: 30%;"><strong>{checkgroup.item.LABEL}</strong></td>
+			<td style="width: 12%;">
+				<!-- IF checkgroup.item.S_OK --><span style="color: #228B22;">&#10004; {L_MAILHEALTH_CHECK_OK}</span><!-- ENDIF -->
+				<!-- IF checkgroup.item.S_WARN --><span style="color: #C7860C;">&#9888; {L_MAILHEALTH_CHECK_WARN}</span><!-- ENDIF -->
+				<!-- IF checkgroup.item.S_FAIL --><span style="color: #BC2A4D;">&#10006; {L_MAILHEALTH_CHECK_FAIL}</span><!-- ENDIF -->
+			</td>
+			<td>
+				{checkgroup.item.DETAIL}
+				<!-- IF checkgroup.item.HINT --><br /><span class="small">{checkgroup.item.HINT}</span><!-- ENDIF -->
+			</td>
+		</tr>
+	<!-- END item -->
+	</tbody>
+	</table>
+	</div>
+</fieldset>
+<!-- END checkgroup -->
+
+<fieldset class="submit-buttons">
+	<legend>{L_MAILHEALTH_CHECK_ACTIONS}</legend>
+	<p class="small" style="text-align: left;">{L_MAILHEALTH_CHECK_ACTIONS_EXPLAIN}</p>
+	<input class="button1" type="submit" name="test_connection" value="{L_MAILHEALTH_TEST}"<!-- IF not S_IMAP_AVAILABLE --> disabled="disabled"<!-- ENDIF --> />
+	<input class="button2" type="submit" name="run_now" value="{L_MAILHEALTH_CHECK_RUN_NOW}" />
+	<input class="button2" type="submit" name="dns_check" value="{L_MAILHEALTH_DNS_RUN}"<!-- IF not S_DNS_AVAILABLE --> disabled="disabled"<!-- ENDIF --> />
+	<input class="button2" type="submit" name="test_messages" value="{L_MAILHEALTH_TEST_MESSAGES}" title="{L_MAILHEALTH_TEST_MESSAGES_EXPLAIN}" />
+	<input class="button2" type="submit" name="export_report" value="{L_MAILHEALTH_EXPORT_REPORT}" />
+	{S_FORM_TOKEN}
+</fieldset>
+
+</form>
+
+<!-- INCLUDE overall_footer.html -->

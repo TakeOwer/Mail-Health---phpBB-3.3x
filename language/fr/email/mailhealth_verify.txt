@@ -1,0 +1,15 @@
+Subject: Confirmez votre adresse e-mail
+
+Bonjour {USERNAME},
+
+Vous avez changé l'adresse e-mail de votre compte sur {SITENAME}, après que la précédente a cessé d'accepter les messages.
+
+Ce message est la vérification : si vous le lisez, la nouvelle adresse fonctionne. Cliquez sur le lien ci-dessous pour la confirmer tout de suite :
+
+{U_CONFIRM}
+
+Si vous ne faites rien, l'adresse sera confirmée d'elle-même après {CONFIRM_DAYS} jours sans problème.
+
+Si vous n'avez rien changé, ignorez ce message.
+
+{EMAIL_SIG}

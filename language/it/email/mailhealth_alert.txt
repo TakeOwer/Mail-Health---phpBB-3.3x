@@ -1,0 +1,19 @@
+Subject: Allarme Mail Health: {BOUNCES_TOTAL} rimbalzi in 24 ore
+
+Ciao {USERNAME},
+
+Mail Health su {SITENAME} ha ricevuto {BOUNCES_TOTAL} messaggi di mancato recapito nelle ultime 24 ore, oltre la soglia di allarme di {ALERT_LIMIT}.
+
+Rimbalzi definitivi (indirizzo inesistente): {BOUNCES_HARD}
+Rimbalzi temporanei: {BOUNCES_SOFT}
+
+Un aumento improvviso di solito indica un problema di invio più che tanti indirizzi morti tutti insieme: l'IP del server in una blacklist, un record SPF o DKIM rotto, oppure una newsletter spedita a una lista vecchia.
+
+Il registro dei rimbalzi mostra i dettagli:
+{U_ACP}
+
+La scheda Check-up può verificare i record DNS del tuo dominio.
+
+Per le prossime 24 ore non riceverai altri allarmi.
+
+{EMAIL_SIG}

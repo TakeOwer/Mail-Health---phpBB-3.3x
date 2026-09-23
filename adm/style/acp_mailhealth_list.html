@@ -1,0 +1,226 @@
+<!-- INCLUDE overall_header.html -->
+
+<a id="maincontent"></a>
+
+<style>
+.mh-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
+.mh-scroll > table { min-width: 700px; }
+.mh-chart { display: flex; align-items: flex-end; gap: 6px; height: 160px; padding: 8px 4px 0; border-bottom: 1px solid #BFC1CF; margin-bottom: 4px; }
+.mh-col { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; min-width: 18px; }
+.mh-bar-hard { background: #BC2A4D; }
+.mh-bar-soft { background: #E8A33D; }
+.mh-labels { display: flex; gap: 6px; padding: 0 4px; }
+.mh-labels span { flex: 1; text-align: center; font-size: 0.85em; color: #536482; min-width: 18px; }
+.mh-legend span { display: inline-block; width: 10px; height: 10px; margin: 0 4px 0 12px; vertical-align: middle; }
+.mh-chart-empty { padding: 18px 8px; color: #536482; font-style: italic; margin: 0; }
+.mh-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px 0; }
+.mh-toolbar .mh-spacer { flex: 1; }
+.mh-chart-inner { min-width: 320px; }
+.mh-legend { word-wrap: break-word; }
+/* On a phone the twelve dates cannot all fit: one in three is kept, and the
+   others keep their space so the labels stay under their own bar. */
+@media (max-width: 600px) {
+	.mh-labels span { font-size: 0.75em; }
+	.mh-labels span:not(:nth-child(3n)) { visibility: hidden; }
+	.mh-chart { height: 130px; gap: 3px; }
+	.mh-labels { gap: 3px; }
+}
+</style>
+
+<!-- IF S_BOUNCE_MODE -->
+	<h1>{L_ACP_MAILHEALTH_BOUNCES}</h1>
+<!-- INCLUDE acp_mailhealth_badges.html -->
+	<p>{L_MAILHEALTH_BOUNCES_EXPLAIN}</p>
+
+	<fieldset>
+		<legend>{L_MAILHEALTH_CHART_TITLE}</legend>
+		<!-- IF S_CHART_EMPTY -->
+		<p class="mh-chart-empty">{L_MAILHEALTH_CHART_EMPTY}</p>
+		<!-- ELSE -->
+		<div class="mh-scroll">
+		<div class="mh-chart-inner">
+		<div class="mh-chart" role="img" aria-label="{L_MAILHEALTH_CHART_TITLE}">
+		<!-- BEGIN week -->
+			<div class="mh-col" title="{week.TOOLTIP}">
+				<div class="mh-bar-soft" style="height: {week.H_SOFT}%;"></div>
+				<div class="mh-bar-hard" style="height: {week.H_HARD}%;"></div>
+			</div>
+		<!-- END week -->
+		</div>
+		<div class="mh-labels"><!-- BEGIN week --><span>{week.LABEL}</span><!-- END week --></div>
+		</div>
+		</div>
+		<p class="mh-legend small">
+			<span class="mh-bar-hard"></span>{L_MAILHEALTH_HARD}: <strong>{CHART_TOTAL_HARD}</strong>
+			<span class="mh-bar-soft"></span>{L_MAILHEALTH_SOFT}: <strong>{CHART_TOTAL_SOFT}</strong>
+			&nbsp;&middot;&nbsp; {{ lang('MAILHEALTH_CHART_SCALE', CHART_MAX) }}
+		</p>
+		<!-- ENDIF -->
+	</fieldset>
+
+	<!-- IF .domain -->
+	<fieldset>
+		<legend>{L_MAILHEALTH_DOMAINS}</legend>
+		<p class="small">{L_MAILHEALTH_DOMAINS_EXPLAIN}</p>
+		<div class="mh-scroll">
+		<table class="table1 zebra-table">
+		<thead>
+			<tr>
+				<th>{L_MAILHEALTH_DOMAIN}</th>
+				<th>{L_MAILHEALTH_HARD}</th>
+				<th>{L_MAILHEALTH_SOFT}</th>
+				<th>{L_MAILHEALTH_TOTAL}</th>
+				<th>{L_MAILHEALTH_ADDRESSES}</th>
+			</tr>
+		</thead>
+		<tbody>
+		<!-- BEGIN domain -->
+			<tr>
+				<td><strong>{domain.DOMAIN}</strong></td>
+				<td>{domain.HARD}</td>
+				<td>{domain.SOFT}</td>
+				<td>{domain.TOTAL}</td>
+				<td>{domain.ADDRESSES}</td>
+			</tr>
+		<!-- END domain -->
+		</tbody>
+		</table>
+		</div>
+	</fieldset>
+	<!-- ENDIF -->
+
+	<form id="mailhealth_filter" method="post" action="{U_LIST}">
+		<div class="mh-toolbar">
+			<input type="search" name="q" value="{SEARCH}" placeholder="{L_MAILHEALTH_SEARCH_EMAIL}" />
+			<select name="type">
+				<option value="0"<!-- IF FILTER_TYPE == 0 --> selected="selected"<!-- ENDIF -->>{L_MAILHEALTH_ALL_TYPES}</option>
+				<option value="2"<!-- IF FILTER_TYPE == 2 --> selected="selected"<!-- ENDIF -->>{L_MAILHEALTH_HARD}</option>
+				<option value="1"<!-- IF FILTER_TYPE == 1 --> selected="selected"<!-- ENDIF -->>{L_MAILHEALTH_SOFT}</option>
+			</select>
+			<input class="button2" type="submit" value="{L_MAILHEALTH_FILTER}" />
+			<span class="mh-spacer"></span>
+			<span>{{ lang('MAILHEALTH_TOTAL_ROWS', TOTAL_ROWS) }}</span>
+			<a class="button2" href="{U_EXPORT}">{L_MAILHEALTH_EXPORT_CSV}</a>
+		</div>
+	</form>
+
+	<form id="mailhealth_bounces" method="post" action="{U_LIST}">
+
+	<!-- IF .pagination --><div class="pagination"><!-- INCLUDE pagination.html --></div><!-- ENDIF -->
+
+	<div class="mh-scroll">
+	<table class="table1 zebra-table">
+	<thead>
+		<tr>
+			<th style="width: 1%;"><input type="checkbox" onclick="var c=this.checked;document.querySelectorAll('#mailhealth_bounces input[name=&quot;mark[]&quot;]').forEach(function(e){e.checked=c;});" title="{L_MARK_ALL}" /></th>
+			<th>{L_MAILHEALTH_TIME}</th>
+			<th>{L_MAILHEALTH_EMAIL}</th>
+			<th>{L_MAILHEALTH_USER}</th>
+			<th>{L_MAILHEALTH_TYPE}</th>
+			<th>{L_MAILHEALTH_REASON}</th>
+			<th>{L_MAILHEALTH_STATUS}</th>
+			<th>{L_MAILHEALTH_DIAGNOSTIC}</th>
+		</tr>
+	</thead>
+	<tbody>
+	<!-- BEGIN bounce -->
+		<tr>
+			<td><input type="checkbox" name="mark[]" value="{bounce.ID}" /></td>
+			<td style="white-space: nowrap;">{bounce.TIME}</td>
+			<td>{bounce.EMAIL}<!-- IF bounce.S_SUPPRESSED --> <span class="small" title="{L_MAILHEALTH_IN_SUPPRESSION}">&#128683;</span><!-- ENDIF --></td>
+			<td>{bounce.USERNAME}</td>
+			<td><!-- IF bounce.S_HARD --><strong style="color: #BC2A4D;">{bounce.TYPE}</strong><!-- ELSE --><span style="color: #B77A1A;">{bounce.TYPE}</span><!-- ENDIF --></td>
+			<td>{bounce.REASON}</td>
+			<td>{bounce.STATUS}</td>
+			<td><span class="small">{bounce.DIAGNOSTIC}</span></td>
+		</tr>
+	<!-- BEGINELSE -->
+		<tr><td colspan="8" style="text-align: center;">{L_MAILHEALTH_NO_BOUNCES}</td></tr>
+	<!-- END bounce -->
+	</tbody>
+	</table>
+	</div>
+
+	<!-- IF .pagination --><div class="pagination"><!-- INCLUDE pagination.html --></div><!-- ENDIF -->
+
+	<!-- IF .bounce -->
+	<fieldset class="quick">
+		<label for="bulk_action">{L_MAILHEALTH_BULK_LABEL}</label>
+		<select name="bulk_action" id="bulk_action">
+			<option value="">{L_MAILHEALTH_BULK_CHOOSE}</option>
+			<option value="suppress">{L_MAILHEALTH_BULK_SUPPRESS}</option>
+			<option value="reset">{L_MAILHEALTH_BULK_RESET}</option>
+			<option value="delete">{L_MAILHEALTH_BULK_DELETE}</option>
+		</select>
+		<input class="button2" type="submit" name="bulk" value="{L_MAILHEALTH_BULK_APPLY}" />
+		<input type="hidden" name="q" value="{SEARCH}" />
+		<input type="hidden" name="type" value="{FILTER_TYPE}" />
+		{S_FORM_TOKEN}
+	</fieldset>
+	<!-- ENDIF -->
+
+	</form>
+<!-- ENDIF -->
+
+<!-- IF S_SUPPRESS_MODE -->
+	<h1>{L_ACP_MAILHEALTH_SUPPRESS}</h1>
+<!-- INCLUDE acp_mailhealth_badges.html -->
+	<p>{L_MAILHEALTH_SUPPRESS_EXPLAIN}</p>
+
+	<form id="mailhealth_suppress_add" method="post" action="{U_ACTION}">
+	<fieldset>
+		<legend>{L_MAILHEALTH_ADD_EMAIL}</legend>
+		<dl>
+			<dt><label for="new_email">{L_MAILHEALTH_EMAIL}{L_COLON}</label></dt>
+			<dd>
+				<input type="email" id="new_email" name="new_email" value="" maxlength="100" />
+				<input class="button2" type="submit" name="add_email" value="{L_SUBMIT}" />
+			</dd>
+		</dl>
+		{S_FORM_TOKEN}
+	</fieldset>
+	</form>
+
+	<form id="mailhealth_suppress_filter" method="post" action="{U_LIST}">
+		<div class="mh-toolbar">
+			<input type="search" name="q" value="{SEARCH}" placeholder="{L_MAILHEALTH_SEARCH_EMAIL}" />
+			<input class="button2" type="submit" value="{L_MAILHEALTH_FILTER}" />
+			<span class="mh-spacer"></span>
+			<span>{{ lang('MAILHEALTH_TOTAL_ROWS', TOTAL_ROWS) }}</span>
+			<a class="button2" href="{U_EXPORT}">{L_MAILHEALTH_EXPORT_CSV}</a>
+		</div>
+	</form>
+
+	<!-- IF .pagination --><div class="pagination"><!-- INCLUDE pagination.html --></div><!-- ENDIF -->
+
+	<div class="mh-scroll">
+	<table class="table1 zebra-table">
+	<thead>
+		<tr>
+			<th>{L_MAILHEALTH_EMAIL}</th>
+			<th>{L_MAILHEALTH_REASON}</th>
+			<th>{L_MAILHEALTH_ORIGIN}</th>
+			<th>{L_MAILHEALTH_TIME}</th>
+			<th>{L_ACTION}</th>
+		</tr>
+	</thead>
+	<tbody>
+	<!-- BEGIN suppressed -->
+		<tr>
+			<td>{suppressed.EMAIL}</td>
+			<td>{suppressed.REASON}</td>
+			<td><!-- IF suppressed.S_MANUAL -->{L_MAILHEALTH_ORIGIN_MANUAL}<!-- ELSE -->{L_MAILHEALTH_ORIGIN_AUTO}<!-- ENDIF --></td>
+			<td style="white-space: nowrap;">{suppressed.TIME}</td>
+			<td><a href="{suppressed.U_REMOVE}">{L_MAILHEALTH_REMOVE}</a></td>
+		</tr>
+	<!-- BEGINELSE -->
+		<tr><td colspan="5" style="text-align: center;">{L_MAILHEALTH_NO_SUPPRESSED}</td></tr>
+	<!-- END suppressed -->
+	</tbody>
+	</table>
+	</div>
+
+	<!-- IF .pagination --><div class="pagination"><!-- INCLUDE pagination.html --></div><!-- ENDIF -->
+<!-- ENDIF -->
+
+<!-- INCLUDE overall_footer.html -->

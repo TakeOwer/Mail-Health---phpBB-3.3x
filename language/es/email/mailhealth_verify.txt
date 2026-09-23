@@ -1,0 +1,15 @@
+Subject: Confirma tu dirección de correo
+
+Hola {USERNAME}:
+
+Has cambiado la dirección de correo de tu cuenta en {SITENAME}, después de que la anterior dejara de aceptar mensajes.
+
+Este mensaje es la comprobación: si lo estás leyendo, la nueva dirección funciona. Haz clic en el enlace de abajo para confirmarla ahora mismo:
+
+{U_CONFIRM}
+
+Si no haces nada, la dirección se confirma sola pasados {CONFIRM_DAYS} días sin problemas.
+
+Si no has cambiado nada, ignora este mensaje.
+
+{EMAIL_SIG}

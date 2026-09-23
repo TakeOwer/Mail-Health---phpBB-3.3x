@@ -1,0 +1,64 @@
+<!-- INCLUDE overall_header.html -->
+
+<a id="maincontent"></a>
+
+<h1>{L_ACP_MAILHEALTH_USERS}</h1>
+<!-- INCLUDE acp_mailhealth_badges.html -->
+<p>{{ lang('MAILHEALTH_USERS_EXPLAIN', CONFIRM_DAYS) }}</p>
+
+<form id="mailhealth_users_filter" method="post" action="{U_ACTION}">
+	<fieldset class="quick" style="text-align: left;">
+		<select name="state">
+			<option value="0"<!-- IF FILTER_STATE == 0 --> selected="selected"<!-- ENDIF -->>{L_MAILHEALTH_ALL_STATES}</option>
+			<option value="1"<!-- IF FILTER_STATE == 1 --> selected="selected"<!-- ENDIF -->>{L_MAILHEALTH_STATE_1}</option>
+			<option value="2"<!-- IF FILTER_STATE == 2 --> selected="selected"<!-- ENDIF -->>{L_MAILHEALTH_STATE_2}</option>
+			<option value="3"<!-- IF FILTER_STATE == 3 --> selected="selected"<!-- ENDIF -->>{L_MAILHEALTH_STATE_3}</option>
+		</select>
+		<input class="button2" type="submit" value="{L_MAILHEALTH_FILTER}" />
+		&nbsp; {{ lang('MAILHEALTH_TOTAL_ROWS', TOTAL_ROWS) }}
+	</fieldset>
+</form>
+
+<!-- IF .pagination --><div class="pagination"><!-- INCLUDE pagination.html --></div><!-- ENDIF -->
+
+<style>
+.mh-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
+.mh-scroll > table { min-width: 620px; }
+</style>
+
+<div class="mh-scroll">
+<table class="table1 zebra-table">
+<thead>
+	<tr>
+		<th>{L_MAILHEALTH_USER}</th>
+		<th>{L_MAILHEALTH_STATE}</th>
+		<th>{L_MAILHEALTH_BOUNCED_EMAIL}</th>
+		<th>{L_MAILHEALTH_CURRENT_EMAIL}</th>
+		<th>{L_MAILHEALTH_SINCE}</th>
+		<th>{L_ACTION}</th>
+	</tr>
+</thead>
+<tbody>
+<!-- BEGIN member -->
+	<tr>
+		<td>{member.USERNAME}<!-- IF member.S_INACTIVE --><br /><span class="small" style="color: #BC2A4D;">{L_MAILHEALTH_ACCOUNT_INACTIVE}</span><!-- ENDIF --></td>
+		<td>
+			<!-- IF member.STATE_ID == 1 --><strong style="color: #BC2A4D;">{member.STATE}</strong>
+			<!-- ELSEIF member.STATE_ID == 2 --><strong style="color: #B77A1A;">{member.STATE}</strong>
+			<!-- ELSE --><strong style="color: #228B22;">{member.STATE}</strong><!-- ENDIF -->
+		</td>
+		<td>{member.BOUNCED_EMAIL}</td>
+		<td>{member.CURRENT_EMAIL}</td>
+		<td style="white-space: nowrap;">{member.TIME}</td>
+		<td><a href="{member.U_RESET}" title="{L_MAILHEALTH_USER_RESET_EXPLAIN}">{L_MAILHEALTH_USER_RESET_LINK}</a></td>
+	</tr>
+<!-- BEGINELSE -->
+	<tr><td colspan="6" style="text-align: center;">{L_MAILHEALTH_NO_USERS}</td></tr>
+<!-- END member -->
+</tbody>
+</table>
+</div>
+
+<!-- IF .pagination --><div class="pagination"><!-- INCLUDE pagination.html --></div><!-- ENDIF -->
+
+<!-- INCLUDE overall_footer.html -->

@@ -1,0 +1,19 @@
+Subject: Mail-Health-Warnung: {BOUNCES_TOTAL} Rückläufer in 24 Stunden
+
+Hallo,
+
+Mail Health auf {SITENAME} hat in den letzten 24 Stunden {BOUNCES_TOTAL} Unzustellbarkeitsberichte erhalten, mehr als die Warngrenze von {ALERT_LIMIT}.
+
+Endgültige Rückläufer (Adresse existiert nicht): {BOUNCES_HARD}
+Vorübergehende Rückläufer: {BOUNCES_SOFT}
+
+Ein plötzlicher Anstieg deutet meist auf ein Versandproblem hin und nicht auf viele tote Adressen auf einmal: die IP des Servers auf einer Sperrliste, ein kaputter SPF- oder DKIM-Eintrag, oder ein Newsletter an eine alte Liste.
+
+Das Protokoll der Rückläufer zeigt die Einzelheiten:
+{U_ACP}
+
+Der Reiter Prüfung kann die DNS-Einträge deiner Domain kontrollieren.
+
+In den nächsten 24 Stunden bekommst du keine weitere Warnung.
+
+{EMAIL_SIG}
