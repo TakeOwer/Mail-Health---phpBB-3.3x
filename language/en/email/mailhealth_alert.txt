@@ -1,48 +1,19 @@
 Subject: Mail Health alert: {BOUNCES_TOTAL} bounces in 24 hours
 
-<html>
-<head>
-  <title>Le Ombre della Rete 360</title>
-</head>
-<body>
-	<p><div align="center"><a href="https://netshadows.de/ombra/"><img src="https://netshadows.de/ombra/images/banner/banner_email.jpg" alt="https://netshadows.de/ombra/" title="Le Ombre della Rete 360°" /></a></div></p>
-	<p></p>
-</body>
-</html><br /><br />
+Hello {USERNAME},
 
-Hello {USERNAME},<br /><br />
+Mail Health on {SITENAME} received {BOUNCES_TOTAL} delivery failure reports in the last 24 hours, above the alert threshold of {ALERT_LIMIT}.
 
-Mail Health on {SITENAME} received {BOUNCES_TOTAL} delivery failure reports in the last 24 hours, above the alert threshold of {ALERT_LIMIT}.<br /><br />
+Hard bounces (address does not exist): {BOUNCES_HARD}
+Soft bounces (temporary failures): {BOUNCES_SOFT}
 
-Hard bounces (address does not exist): {BOUNCES_HARD}<br />
-Soft bounces (temporary failures): {BOUNCES_SOFT}<br /><br />
+A sudden rise usually points to a sending problem rather than to many dead addresses at once: the server's IP on a blacklist, a broken SPF or DKIM record, or a newsletter sent to an old list.
 
-A sudden rise usually points to a sending problem rather than to many dead addresses at once: the server's IP on a blacklist, a broken SPF or DKIM record, or a newsletter sent to an old list.<br /><br />
+The bounce log shows the details:
+{U_ACP}
 
-The bounce log shows the details:<br />
-{U_ACP}<br /><br />
+The check-up tab can verify the DNS records of your domain.
 
-The check-up tab can verify the DNS records of your domain.<br /><br />
+You will not receive another alert for the next 24 hours.
 
-You will not receive another alert for the next 24 hours.<br /><br />
-
-{EMAIL_SIG}<br /><br />
-
--------------------------------------<br />
-(*) Pursuant to Italian law 196/03, netshadows.de - Forum delle Ombre 360° is the sole owner of the processing of your personal data for the sole purpose of satisfying your request.<br />
-The use of this data is limited exclusively to the staff of netshadows.de - Forum delle Ombre 360°.<br />
-Naturally, any other communication to third parties is excluded.<br /><br />
-
-NOTE: Make sure that any AntiSpam software does not block the email containing your instructions. We recommend adding these addresses to your address book.<br /><br />
-
-Forum administrator:<br />
-founder@netshadows.de<br /><br />
-
-Information on the forum:<br />
-info@netshadows.de<br /><br />
-
-Forum technical support:<br />
-support@netshadows.de<br /><br />
-
-Disputes:<br />
-contenzioso@netshadows.de<br />
+{EMAIL_SIG}
