@@ -149,6 +149,24 @@ $t->same('sparito@tiscali.it', $parser->parse($exim)['email'], 'il formato Exim 
 $italian = "From: postmaster@aruba.it{$n}Subject: Messaggio non consegnato{$n}{$n}Il messaggio per <mario@aruba.it> non è stato consegnato: destinatario sconosciuto{$n}";
 $t->same(dsn_parser::TYPE_HARD, $parser->parse($italian)['type'], 'un rimbalzo italiano senza codice viene riconosciuto');
 
+// Header fields fold across lines. Gmail's reply is long enough to be folded,
+// and matching one physical line used to cut it at "...you tried to reach does".
+$folded = "From: Mail Delivery Subsystem <mailer-daemon@googlemail.com>{$n}Subject: Delivery Status Notification (Failure){$n}Content-Type: multipart/report; report-type=delivery-status{$n}{$n}Content-Type: message/delivery-status{$n}{$n}Final-Recipient: rfc822; tagliato@gmail.com{$n}Action: failed{$n}Status: 5.1.1{$n}Diagnostic-Code: smtp; 550-5.1.1 The email account that you tried to reach does{$n} not exist. Please try double-checking the recipient's email address for typos{$n} or unnecessary spaces.{$n}{$n}";
+$parsed = $parser->parse($folded);
+$t->same(
+	"smtp; 550-5.1.1 The email account that you tried to reach does not exist. Please try double-checking the recipient's email address for typos or unnecessary spaces.",
+	$parsed['diagnostic'],
+	'una diagnostica ripiegata su piu\' righe viene ricomposta per intero'
+);
+$t->same(dsn_parser::TYPE_HARD, $parsed['type'], 'la diagnostica ricomposta resta un rimbalzo definitivo');
+
+$single = "From: MAILER-DAEMON@relay.it{$n}Subject: Undelivered Mail{$n}Content-Type: multipart/report; report-type=delivery-status{$n}{$n}Content-Type: message/delivery-status{$n}{$n}Final-Recipient: rfc822; tizio@relay.it{$n}Action: failed{$n}Status: 5.1.1{$n}Diagnostic-Code: smtp; 550 5.1.1 User Unknown (in reply to RCPT command){$n}{$n}";
+$t->same(
+	'smtp; 550 5.1.1 User Unknown (in reply to RCPT command)',
+	$parser->parse($single)['diagnostic'],
+	'una diagnostica su una riga sola resta invariata'
+);
+
 $t->group('Motivo in chiaro');
 
 $t->same('MAILHEALTH_WHY_FULL', $parser->describe('4.2.2', ''), '4.2.2 è casella piena');

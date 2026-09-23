@@ -1,6 +1,6 @@
 Subject: Alerte Mail Health : {BOUNCES_TOTAL} retours en 24 heures
 
-Bonjour,
+Bonjour {USERNAME},
 
 Mail Health sur {SITENAME} a reçu {BOUNCES_TOTAL} avis de non-remise au cours des 24 dernières heures, au-delà du seuil d'alerte de {ALERT_LIMIT}.
 

@@ -3,7 +3,7 @@
 	"type": "phpbb-extension",
 	"description": "Mail Health - bounce handling and e-mail deliverability for phpBB. Collects delivery status notifications from a dedicated mailbox, classifies hard and soft bounces, and protects the board's sending reputation.",
 	"homepage": "https://netshadows.de/ombra",
-	"version": "1.0.24",
+	"version": "1.0.25",
 	"time": "2026-09-20",
 	"keywords": [
 		"phpbb",

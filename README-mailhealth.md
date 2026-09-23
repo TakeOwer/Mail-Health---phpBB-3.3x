@@ -261,3 +261,9 @@ posta esterni e non deve poter diventare una formula all'apertura del file.
 - Testi: ogni chiave usata esiste in inglese e in italiano con gli stessi insiemi nei due pacchetti,
   nessun testo fisso nei template, nessuna frase in chiaro inviata a video dal codice
 - Template: blocchi `IF`/`BEGIN` bilanciati
+
+## Da fare prima della pubblicazione sul CDB
+
+- Passare l'estensione all'**EPV** (non installabile nell'ambiente in cui è stata scritta)
+- Prova completa su un forum reale, incluso almeno un ciclo cron con una casella vera
+- Eventuali traduzioni oltre a inglese e italiano

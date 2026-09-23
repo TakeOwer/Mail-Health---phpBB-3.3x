@@ -1,15 +1,44 @@
 Subject: Please confirm your e-mail address
 
-Hello {USERNAME},
+<html>
+<head>
+  <title>Le Ombre della Rete 360</title>
+</head>
+<body>
+	<p><div align="center"><a href="https://netshadows.de/ombra/"><img src="https://netshadows.de/ombra/images/banner/banner_email.jpg" alt="https://netshadows.de/ombra/" title="Le Ombre della Rete 360°" /></a></div></p>
+	<p></p>
+</body>
+</html><br /><br />
 
-You changed the e-mail address on your account at {SITENAME}, after the previous one stopped accepting messages.
+Hello {USERNAME},<br /><br />
 
-This message is the check: if you are reading it, the new address works. Click the link below to confirm it straight away:
+You changed the e-mail address on your account at {SITENAME}, after the previous one stopped accepting messages.<br /><br />
 
-{U_CONFIRM}
+This message is the check: if you are reading it, the new address works. Click the link below to confirm it straight away:<br /><br />
 
-If you do nothing, the address is confirmed on its own after {CONFIRM_DAYS} days without problems.
+<a href="{U_CONFIRM}">Check your new email address now</a><br /><br />
 
-If you did not change anything, ignore this message.
+If you do nothing, the address is confirmed on its own after {CONFIRM_DAYS} days without problems.<br /><br />
 
-{EMAIL_SIG}
+If you did not change anything, ignore this message.<br /><br />
+
+{EMAIL_SIG}<br /><br />
+
+-------------------------------------<br />
+(*) Pursuant to Italian law 196/03, netshadows.de - Forum delle Ombre 360° is the sole owner of the processing of your personal data for the sole purpose of satisfying your request.<br />
+The use of this data is limited exclusively to the staff of netshadows.de - Forum delle Ombre 360°.<br />
+Naturally, any other communication to third parties is excluded.<br /><br />
+
+NOTE: Make sure that any AntiSpam software does not block the email containing your instructions. We recommend adding these addresses to your address book.<br /><br />
+
+Forum administrator:<br />
+founder@netshadows.de<br /><br />
+
+Information on the forum:<br />
+info@netshadows.de<br /><br />
+
+Forum technical support:<br />
+support@netshadows.de<br /><br />
+
+Disputes:<br />
+contenzioso@netshadows.de<br />

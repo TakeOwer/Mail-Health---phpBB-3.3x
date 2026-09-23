@@ -1,6 +1,6 @@
 Subject: Mail-Health-Warnung: {BOUNCES_TOTAL} Rückläufer in 24 Stunden
 
-Hallo,
+Hallo {USERNAME},
 
 Mail Health auf {SITENAME} hat in den letzten 24 Stunden {BOUNCES_TOTAL} Unzustellbarkeitsberichte erhalten, mehr als die Warngrenze von {ALERT_LIMIT}.
 

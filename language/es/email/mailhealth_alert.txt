@@ -1,6 +1,6 @@
 Subject: Alerta de Mail Health: {BOUNCES_TOTAL} rebotes en 24 horas
 
-Hola:
+Hola {USERNAME}:
 
 Mail Health en {SITENAME} ha recibido {BOUNCES_TOTAL} avisos de no entrega en las últimas 24 horas, por encima del umbral de alerta de {ALERT_LIMIT}.
 

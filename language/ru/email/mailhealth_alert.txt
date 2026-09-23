@@ -1,6 +1,6 @@
 Subject: Оповещение Mail Health: возвратов за 24 часа — {BOUNCES_TOTAL}
 
-Здравствуйте!
+Здравствуйте, {USERNAME}!
 
 Mail Health на форуме {SITENAME} получила за последние 24 часа {BOUNCES_TOTAL} уведомлений о недоставке, что выше порога оповещения {ALERT_LIMIT}.
 

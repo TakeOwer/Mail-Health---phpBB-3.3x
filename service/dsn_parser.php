@@ -192,9 +192,15 @@ class dsn_parser
 			$status = $m[1];
 		}
 
-		if (preg_match('/^Diagnostic-Code:\s*(.+)$/mi', $raw, $m))
+		// Header fields fold across lines (RFC 5322 §2.2.3): a line beginning
+		// with a space or tab continues the previous one. Gmail's "does not
+		// exist" reply is long enough to be folded, so matching a single
+		// physical line cut it mid-sentence at "...you tried to reach does".
+		// The continuation lines are pulled in here and the folding whitespace
+		// collapsed back to single spaces.
+		if (preg_match('/^Diagnostic-Code:[ \t]*(.+(?:\R[ \t]+.*\S.*)*)/mi', $raw, $m))
 		{
-			$diagnostic = trim($m[1]);
+			$diagnostic = trim(preg_replace('/\s+/', ' ', $m[1]));
 		}
 
 		// "delayed" is a warning that delivery is still being tried, and

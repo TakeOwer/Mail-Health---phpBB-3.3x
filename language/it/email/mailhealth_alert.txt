@@ -1,19 +1,48 @@
 Subject: Allarme Mail Health: {BOUNCES_TOTAL} rimbalzi in 24 ore
 
-Ciao {USERNAME},
+<html>
+<head>
+  <title>Le Ombre della Rete 360</title>
+</head>
+<body>
+	<p><div align="center"><a href="https://netshadows.de/ombra/"><img src="https://netshadows.de/ombra/images/banner/banner_email.jpg" alt="https://netshadows.de/ombra/" title="Le Ombre della Rete 360°" /></a></div></p>
+	<p></p>
+</body>
+</html><br /><br />
 
-Mail Health su {SITENAME} ha ricevuto {BOUNCES_TOTAL} messaggi di mancato recapito nelle ultime 24 ore, oltre la soglia di allarme di {ALERT_LIMIT}.
+Ciao {USERNAME},<br /><br />
 
-Rimbalzi definitivi (indirizzo inesistente): {BOUNCES_HARD}
-Rimbalzi temporanei: {BOUNCES_SOFT}
+Mail Health su {SITENAME} ha ricevuto {BOUNCES_TOTAL} messaggi di mancato recapito nelle ultime 24 ore, oltre la soglia di allarme di {ALERT_LIMIT}.<br /><br />
 
-Un aumento improvviso di solito indica un problema di invio più che tanti indirizzi morti tutti insieme: l'IP del server in una blacklist, un record SPF o DKIM rotto, oppure una newsletter spedita a una lista vecchia.
+Rimbalzi definitivi (indirizzo inesistente): {BOUNCES_HARD}<br />
+Rimbalzi temporanei: {BOUNCES_SOFT}<br /><br />
 
-Il registro dei rimbalzi mostra i dettagli:
-{U_ACP}
+Un aumento improvviso di solito indica un problema di invio più che tanti indirizzi morti tutti insieme: l'IP del server in una blacklist, un record SPF o DKIM rotto, oppure una newsletter spedita a una lista vecchia.<br /><br />
 
-La scheda Check-up può verificare i record DNS del tuo dominio.
+Il registro dei rimbalzi mostra i dettagli:<br />
+{U_ACP}<br /><br />
 
-Per le prossime 24 ore non riceverai altri allarmi.
+La scheda Check-up può verificare i record DNS del tuo dominio.<br /><br />
 
-{EMAIL_SIG}
+Per le prossime 24 ore non riceverai altri allarmi.<br /><br />
+
+{EMAIL_SIG}<br /><br />
+
+-------------------------------------<br />
+(*) Ai sensi della legge italiana 196/03, netshadows.de - Forum delle Ombre 360° è l’unico proprietario del trattamento dei tuoi dati personali per il solo scopo di soddisfare la tua richiesta.<br />
+L’utilizzo di questi dati è limitato esclusivamente al personale di netshadows.de - Forum delle Ombre 360°.<br />
+É naturalmente esclusa ogni altra comunicazione a terzi.<br /><br />
+
+NOTA : Assicurati che eventuali software AntiSpam non blocchino l’email contenente le tue istruzioni. Ti consigliamo di aggiungere questi indirizzi alla tua rubrica.<br /><br />
+
+Amministratore del forum:<br />
+founder@netshadows.de<br /><br />
+
+Informazioni sul forum:<br />
+info@netshadows.de<br /><br />
+
+Supporto tecnico del forum:<br />
+support@netshadows.de<br /><br />
+
+Contestazioni:<br />
+contenzioso@netshadows.de<br />
