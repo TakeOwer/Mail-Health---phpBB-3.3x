@@ -1,3 +1,139 @@
+Mail Health - phpBB 3.3x
+
+![Version](https://img.shields.io/badge/version-1.0.25-105080)
+![phpBB](https://img.shields.io/badge/phpBB-3.3.x-377a33)
+![PHP](https://img.shields.io/badge/PHP-%3E%3D7.4-377a33)
+![License](https://img.shields.io/badge/license-GPL--2.0--only-7f7f7f)
+
+Bounce message management and email health for phpBB 3.3.x.
+The forum sends emails continuously but knows nothing about their delivery status. Mail Health closes the loop: it reads a dedicated mailbox, recognizes error messages, distinguishes permanent failures from temporary ones, stops sending to dead addresses, and tracks every affected user until the issue is resolved.
+
+Version: 1.0.25
+Requirements: phpBB 3.3.0+, PHP 7.2+ (also verified on PHP 8.3)
+
+No server installations required: Mail Health connects to the mailbox on its own.
+
+Installation:
+Copy the folder to ext/salvocortesiano/mailhealth/
+ACP → Customise → Extension management → Mail Health → Enable
+ACP → Extensions → Mail Health → Settings
+
+Updating from a previous version:
+phpBB updates an extension's database only when it is enabled. Overwriting files on an active extension is not enough. The correct procedure:
+ACP → Customise → Extension management → Mail Health → Disable
+(do not click "Delete data", or you will lose your logs, lists, and settings)
+
+Upload the new files, overwriting the old ones.
+Enable the extension again.
+ACP → General → Purge the cache
+If you skip a step, the first row of the Check-up tab will alert you, and in the meantime, the Mail Health cron job will safely remain paused instead of throwing an error.
+
+Minimal configuration:
+There is no need to create a new mailbox. phpBB sends every email using the board contact address (General → Email settings), so bounce notifications always return there: Mail Health must read that mailbox. It only deletes messages recognized as bounces and leaves all other email intact.
+For bounces to properly return to that address, the forum must send emails via SMTP (General → Email settings → Use SMTP server for email: Yes). Using default hosting mail functions without "Force $from email address" will route bounces to an internal server mailbox where they will go unseen.
+In Mail Health settings, enter your incoming mail server parameters, along with the username and password of the forum's email address.
+Click Auto-detect: it automatically finds the port and security protocol (SSL/TLS or STARTTLS).
+Click Test connection.
+Enable bounce management.
+Open Check-up: the "Where bounces return" line should be green.
+
+Recommended first week action: set to Log only so you can observe what gets intercepted without modifying user accounts.
+
+The five tabs:
+Settings: Mailbox, access mode (automatic, ext-imap, or built-in client), thresholds, retention period, trial period for new addresses, action handling, alerts, DKIM selector, scheduler. Status panels for password encryption and Newsletter integration.
+Bounce Log: 12-week chart broken down by permanent vs. temporary failures. Address search, type filtering, pagination, CSV export. Bulk action with three options: add to suppression list, reset address counters, or delete records.
+Affected Users: Lists every impacted user and their status, featuring filtering and manual restoration options.
+Check-up: Environment, credentials, configuration, data, scheduling, detection, integration. On-demand features: live IMAP login test, immediate cron execution, sender DNS record verification, and downloadable text report for support requests.
+Suppression List: Addresses the forum no longer sends emails to. Manual addition, search, pagination, CSV export. Removing an address restores the user's original account settings.
+
+User notices and address verification:
+When a user's address stops working, email cannot be used to notify them: the warning is sent as a Private Message containing a link to update their address, remaining safely in their forum inbox. The sender can be selected in settings; if left unspecified, the oldest founder account is used.
+As soon as they update their email, a verification email containing a confirmation link is sent to the new address. Opening that link proves the mailbox can receive mail, confirming the address immediately without waiting out the trial period. The link token is a random 32-character code valid for a single address; clicking it multiple times will not trigger an error.
+
+Languages:
+Complete translations in Italian, English, French, Spanish, German, and Russian: ACP interface, user-facing text, verification emails, and alert notifications.
+Each user receives notices and emails in the language selected in their profile, rather than the board's default language. If a user's language pack is missing, phpBB falls back to English. Admin bounce alerts stay in the default board language.
+Note: Translations other than Italian and English have not been reviewed by native speakers. Reviewing them is recommended if you have users in those languages. Language files are located in language/<lang>/.
+
+Most affected domains:
+Above the Bounce Log list, a summary table analyzes recipient domains: permanent failures, temporary failures, total count, and unique addresses. A single bouncing address is an isolated user problem; twenty addresses bouncing simultaneously from the same provider indicates a board-wide issue, such as the server IP being blacklisted.
+
+Testing:
+php tests/run.php
+
+Tests cover user notifications: PM recipient assignment, verification emails sent to the new address rather than the bouncing one, correct link token generation, profile language targeting, and account deactivation settings. Actual mail delivery is mocked so tests run without an active mail server.
+To test actual delivery, use "Send test messages" in the Check-up tab: it sends real test PMs and verification emails in your profile language, reporting if anything was skipped and why.
+No dependencies to install: runs anywhere PHP is available, including basic hosting environments. Validates extension packaging (ensuring every cron task is named correctly), bounce detection, human-readable reason mapping, password encryption, SPF/DMARC rules, and IMAP protections. Returns 0 on success and 1 if any test fails.
+
+State Machine:
+
+(normal) ──threshold reached──▶ BOUNCED ──address updated──▶ ADDRESS UPDATED ──N days without bounces──▶ CONFIRMED
+                                   ▲                                                              │
+                                   └──────── new address bounces too ◀─────────────────────────────┘
+
+
+BOUNCED: Mass emails and notifications disabled (and account deactivated, if configured). Original user settings are backed up.
+ADDRESS UPDATED: As soon as the user — or an administrator — updates the email, the cron job restores original account settings. The new address enters a trial period.
+CONFIRMED: Zero bounces registered during the trial period (default: 30 days).
+
+An account deactivated by Mail Health is only reactivated if it remains inactive for that specific reason: if an admin manually deactivated it for another reason in the meantime, it stays deactivated. Founder accounts are never deactivated.
+
+Alerts:
+Because phpBB does not log total outbound email volume, an exact bounce percentage cannot be calculated. Alerts trigger based on total bounces received within the last 24 hours (default: 20). Alerts are written to the critical log and optionally emailed to the board contact address (capped at maximum one alert per day).
+
+DNS Checks:
+Scans SPF, DKIM, and DMARC records for the sender domain, alongside MX records for the bounce mailbox. Flags missing records, duplicate SPF records (hard error), overly permissive SPF rules (+all), monitor-only DMARC configurations, and revoked DKIM keys. If no DKIM selector is provided, common default selectors are checked.
+Note: DNS checks cannot verify if the outbound server IP matches the SPF record due to variable hosting infrastructure routing.
+
+Mailbox Access:
+Starting with PHP 8.4, the imap extension is no longer part of PHP core and is omitted by many hosting providers. Mail Health includes a custom socket-based IMAP client tailored for required operations: login, folder selection, reading messages without marking them as read, deleting, and closing connections. It automatically defaults to ext-imap when available, falling back to the built-in client otherwise.
+
+Mailbox Password Security:
+Passwords are stored encrypted in the database (sodium_crypto_secretbox or AES-256-GCM via OpenSSL), decrypted strictly upon connection, and immediately cleared from memory.
+The encryption key is never stored in the database. It is retrieved in the following order:
+From the MAILHEALTH_KEY constant in config.php (32-byte base64 string), if defined;
+From store/salvocortesiano_mailhealth/mailhealth_key.php, generated on initial setup.
+
+// Generate a key using PHP: php -r "echo base64_encode(random_bytes(32));"
+define('MAILHEALTH_KEY', 'your-base64-key-here');
+
+Security scope: Protects credentials in the event of database leaks. It does not protect against full filesystem compromises, as the key must reside on the server for automated background cron processing.
+Lost key recovery: If key decryption fails, the ACP cleanly prompts you to re-enter the mailbox password. Ensure store/salvocortesiano_mailhealth/ is included in your routine backups.
+
+Newsletter Extension Integration:
+Mail Health detects the status of salvocortesiano/newsletter (active, disabled, or uninstalled) and displays it under Settings and Check-up. As of Newsletter version 2.8.2, filtering is natively integrated: suppressed addresses are excluded from recipient counts and delivery queues automatically.
+
+Soft-dependency API snippet for other extensions:
+
+if ($phpbb_container->has('salvocortesiano.mailhealth.integration'))
+{
+	$mh = $phpbb_container->get('salvocortesiano.mailhealth.integration');
+
+	$recipients = $mh->filter_recipients($recipients, 'user_email'); // array or DB rows
+	$blocked    = $mh->get_blocked_emails();                         // for SQL filtering
+	$count      = $mh->count_blocked();
+}
+
+
+Architectural Design:
+No Core Events Modified: Address suppression operates directly on native user_notify and user_allow_massemail fields (and user_type when set to high security), which phpBB respects globally. No core patches required; no update compatibility risks.
+Strict Bounce Filtering: Because shared mailboxes contain routine emails, messages are only parsed if they match bounce signatures: sent from system agents (MAILER-DAEMON, postmaster), standard delivery reports, X-Failed-Recipients headers, or typical subject lines ("Undelivered", "Delivery Status Notification"...). Delivery codes must strictly conform to RFC 3463. Delivery success notifications (DSNs) are ignored. All other non-bounce emails remain unread and untouched.
+Conservative Hard-Bounce Classification: Uses SMTP error mapping: 5.x.x as permanent, 4.x.x as temporary. Full mailboxes (5.2.2, 5.3.4) and DNS/routing glitches (5.4.x) are safely categorized as temporary failures. If an address is truly abandoned, repeated bounces will hit the temporary threshold regardless.
+Performance Optimized: Cron runs during user page visits and must execute swiftly. Mail Health fetches message headers first: routine emails and attachments are never fully downloaded. Bounces cap at 256 KB max payload. Messages process sequentially (~2 MB memory footprint) within a strict 10-second ceiling (or 1/3 of the server max_execution_time). Unprocessed items queue for the next execution cycle.
+UID Tracking: Remembers the last processed IMAP Unique Identifier (UID) to read only newly arrived messages sequentially. Large mailboxes with historical mail cause zero performance overhead.
+CSV Injection Protection: CSV exports use semicolon delimiters and UTF-8 BOM encoding for compatibility. Cells starting with =, +, -, or @ are sanitized to prevent formula injection when opening exported logs in spreadsheet applications.
+
+Verification & Quality Assurance:
+Every core method invocation cross-referenced against phpBB 3.3 source code.
+PHP syntax validated against PHP 7.2 minimum up to PHP 8.3 execution environments.
+Check-up routines verified on both fresh and migrated database schema states.
+Handled error responses for connection failures, invalid credentials, or unreachable hosts tested for clear admin-facing feedback.
+Encryption key round-trips, tamper-rejection tests, and file permissions (0600) validated.
+RFC 3464 parser tested against various bounce formats (Exim headers, mailbox full notices, delayed delivery warnings, and non-bounce noise).
+Built-in socket IMAP client tested against live IMAP servers with non-ASCII credentials and targeted bounce deletions.
+State machine logic validated on SQLite database backends across all lifecycle transitions.
+
+
 # Mail Health — phpBB 3.3
 
 Gestione dei messaggi di mancato recapito (bounce) e salute delle e-mail per phpBB 3.3.x.
@@ -7,7 +143,7 @@ cerchio: legge una casella dedicata, riconosce i messaggi di errore, distingue i
 definitivi da quelli temporanei, smette di scrivere agli indirizzi morti e segue ogni utente
 coinvolto finché il problema non è risolto.
 
-- Versione: 1.0.24
+- Versione: 1.0.25
 - Requisiti: phpBB 3.3.0+, PHP 7.2+ (verificato anche su PHP 8.3)
 - Non serve installare nulla sul server: Mail Health si collega alla casella da sola
 
