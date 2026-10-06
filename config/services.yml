@@ -64,6 +64,8 @@ services:
             - '%salvocortesiano.mailhealth.table.bounces%'
             - '%salvocortesiano.mailhealth.table.suppress%'
             - '%salvocortesiano.mailhealth.table.users%'
+            - '%core.table_prefix%user_notifications'
+            - '%core.table_prefix%notification_types'
             - '%core.root_path%'
             - '%core.php_ext%'
 

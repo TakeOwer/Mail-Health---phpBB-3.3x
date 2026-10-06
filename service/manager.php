@@ -44,6 +44,9 @@ class manager
 	const ACTION_STOP_EMAILS	= 1;
 	const ACTION_DEACTIVATE		= 2;
 
+	/** How phpBB names the e-mail notification method */
+	const EMAIL_METHOD = 'notification.method.email';
+
 	const STATE_BOUNCED		= 1;
 	const STATE_CHANGED		= 2;
 	const STATE_CONFIRMED	= 3;
@@ -73,6 +76,12 @@ class manager
 	protected $users_table;
 
 	/** @var string */
+	protected $user_notifications_table;
+
+	/** @var string */
+	protected $notification_types_table;
+
+	/** @var string */
 	protected $root_path;
 
 	/** @var string */
@@ -87,6 +96,8 @@ class manager
 		$bounces_table,
 		$suppress_table,
 		$users_table,
+		$user_notifications_table,
+		$notification_types_table,
 		$root_path,
 		$php_ext
 	)
@@ -99,6 +110,8 @@ class manager
 		$this->bounces_table = $bounces_table;
 		$this->suppress_table = $suppress_table;
 		$this->users_table = $users_table;
+		$this->user_notifications_table = $user_notifications_table;
+		$this->notification_types_table = $notification_types_table;
 		$this->root_path = $root_path;
 		$this->php_ext = $php_ext;
 	}
@@ -425,6 +438,11 @@ class manager
 			'mh_state_time'		=> time(),
 		];
 
+		// phpBB decides notification e-mails (a new private message, a reply
+		// to a watched topic) from its own table, not from user_notify: they
+		// have to be switched off there, and remembered to be put back.
+		$sql_ary['mh_prev_notify_rows'] = $this->block_email_notifications($user_id);
+
 		if (!$existing)
 		{
 			$sql_ary += [
@@ -449,6 +467,116 @@ class manager
 			WHERE user_id = ' . $user_id);
 
 		return true;
+	}
+
+	/**
+	 * Switches off every e-mail notification of one member and reports what
+	 * his settings were, so they can be given back later.
+	 *
+	 * The native columns are not enough. Notifications are decided by the
+	 * user_notifications table, and a member with no row there for a given
+	 * type gets phpBB's default methods, e-mail included: so every enabled
+	 * type needs a row that says no, not only the ones already present.
+	 *
+	 * @param int $user_id
+	 * @return string Previous settings as JSON, for restore_email_notifications()
+	 */
+	protected function block_email_notifications($user_id)
+	{
+		$user_id = (int) $user_id;
+		$previous = [];
+
+		$result = $this->db->sql_query('SELECT item_type, notify
+			FROM ' . $this->user_notifications_table . "
+			WHERE user_id = $user_id
+				AND item_id = 0
+				AND method = '" . $this->db->sql_escape(self::EMAIL_METHOD) . "'");
+
+		while ($row = $this->db->sql_fetchrow($result))
+		{
+			$previous[$row['item_type']] = (int) $row['notify'];
+		}
+		$this->db->sql_freeresult($result);
+
+		foreach ($this->enabled_notification_types() as $type)
+		{
+			if (!array_key_exists($type, $previous))
+			{
+				// No preference saved: phpBB would use its defaults, so a row
+				// has to be created before it can say no. Marked as ours, to
+				// be removed again on restore.
+				$previous[$type] = null;
+
+				$this->db->sql_query('INSERT INTO ' . $this->user_notifications_table . ' ' . $this->db->sql_build_array('INSERT', [
+					'item_type'	=> $type,
+					'item_id'	=> 0,
+					'user_id'	=> $user_id,
+					'method'	=> self::EMAIL_METHOD,
+					'notify'	=> 0,
+				]));
+			}
+			else if ($previous[$type] === 1)
+			{
+				$this->db->sql_query('UPDATE ' . $this->user_notifications_table . " SET notify = 0 " . $this->notification_where($user_id, $type));
+			}
+		}
+
+		return (string) json_encode($previous);
+	}
+
+	/**
+	 * Puts the notification settings back exactly as they were: what was on
+	 * goes on again, and the rows added only to silence the defaults are
+	 * removed rather than left behind as a permanent no.
+	 */
+	protected function restore_email_notifications($user_id, $stored)
+	{
+		$previous = ($stored !== '') ? json_decode($stored, true) : null;
+
+		if (!is_array($previous))
+		{
+			return;
+		}
+
+		foreach ($previous as $type => $notify)
+		{
+			if ($notify === null)
+			{
+				$this->db->sql_query('DELETE FROM ' . $this->user_notifications_table . ' ' . $this->notification_where((int) $user_id, (string) $type));
+			}
+			else if ((int) $notify === 1)
+			{
+				$this->db->sql_query('UPDATE ' . $this->user_notifications_table . ' SET notify = 1 ' . $this->notification_where((int) $user_id, (string) $type));
+			}
+		}
+	}
+
+	protected function notification_where($user_id, $type)
+	{
+		return "WHERE user_id = " . (int) $user_id . "
+			AND item_id = 0
+			AND item_type = '" . $this->db->sql_escape($type) . "'
+			AND method = '" . $this->db->sql_escape(self::EMAIL_METHOD) . "'";
+	}
+
+	/**
+	 * @return array Names of the notification types in use on this board
+	 */
+	protected function enabled_notification_types()
+	{
+		$types = [];
+
+		$result = $this->db->sql_query('SELECT notification_type_name
+			FROM ' . $this->notification_types_table . '
+			WHERE notification_type_enabled = 1');
+
+		while ($row = $this->db->sql_fetchrow($result))
+		{
+			$types[] = $row['notification_type_name'];
+		}
+		$this->db->sql_freeresult($result);
+
+		return $types;
 	}
 
 	/**
@@ -562,6 +690,8 @@ class manager
 		{
 			return;
 		}
+
+		$this->restore_email_notifications($user_id, isset($state_row['mh_prev_notify_rows']) ? (string) $state_row['mh_prev_notify_rows'] : '');
 
 		$sql_ary = [
 			'user_notify'			=> (int) $state_row['mh_prev_notify'],

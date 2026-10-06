@@ -144,7 +144,10 @@ class notifier
 		return $this->routing->route('salvocortesiano_mailhealth_confirm', [
 			'user_id'	=> (int) $user_id,
 			'token'		=> $token,
-		], false, false, \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
+		// The empty session id matters: with false phpBB appends the session
+		// of whoever triggered the send - the administrator, when the cron
+		// runs during a page view - to an e-mail meant for somebody else.
+		], false, '', \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
 	}
 
 	/**

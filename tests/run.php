@@ -326,4 +326,81 @@ $t->ok($result['pm'] && $result['email'], 'il pulsante di prova invia entrambi i
 $t->same('fr', $result['lang'], 'la prova usa la lingua di chi la richiede');
 $t->same('pierre@orange.fr', $probe->mails[0]['to'], 'la prova arriva a chi l\'ha chiesta');
 
+/* ---------------------------------------------------------------------------
+ * phpBB's own e-mail notifications
+ * ------------------------------------------------------------------------ */
+
+$t->group('Notifiche e-mail di phpBB');
+
+if (!extension_loaded('pdo_sqlite'))
+{
+	$t->skip('pdo_sqlite non disponibile: questo gruppo ha bisogno di un database');
+}
+else
+{
+	require MH_ROOT . 'service/manager.php';
+
+	define('USERS_TABLE', 'phpbb_users');
+	define('USER_NORMAL', 0);
+	define('USER_INACTIVE', 1);
+	define('USER_IGNORE', 2);
+	define('USER_FOUNDER', 3);
+	define('INACTIVE_PROFILE', 3);
+	define('ANONYMOUS', 1);
+
+	$db = new phpbb\db\driver\mh_sqlite();
+
+	foreach ([
+		"CREATE TABLE phpbb_users (user_id INTEGER PRIMARY KEY, username TEXT, user_email TEXT, user_type INT, user_notify INT, user_allow_massemail INT, user_inactive_reason INT DEFAULT 0, user_inactive_time INT DEFAULT 0, user_lang TEXT DEFAULT 'it')",
+		"CREATE TABLE b (bounce_id INTEGER PRIMARY KEY, user_id INT, bounce_email TEXT, bounce_type INT, bounce_status TEXT, bounce_diagnostic TEXT, bounce_time INT)",
+		"CREATE TABLE s (suppress_id INTEGER PRIMARY KEY, suppress_email TEXT UNIQUE, suppress_reason TEXT, suppress_manual INT, suppress_time INT)",
+		"CREATE TABLE u (user_id INT PRIMARY KEY, mh_state INT, mh_bounced_email TEXT, mh_new_email TEXT, mh_prev_notify INT, mh_prev_massemail INT, mh_prev_type INT, mh_state_time INT, mh_token TEXT DEFAULT '', mh_token_time INT DEFAULT 0, mh_prev_notify_rows TEXT DEFAULT '')",
+		"CREATE TABLE phpbb_notification_types (notification_type_id INTEGER PRIMARY KEY, notification_type_name TEXT, notification_type_enabled INT)",
+		"CREATE TABLE phpbb_user_notifications (item_type TEXT, item_id INT, user_id INT, method TEXT, notify INT)",
+	] as $query)
+	{
+		$db->pdo->exec($query);
+	}
+
+	$db->pdo->exec("INSERT INTO phpbb_users VALUES (5,'Tester','morto@example.invalid',0,1,1,0,0,'it')");
+	$db->pdo->exec("INSERT INTO phpbb_notification_types VALUES (1,'notification.type.pm',1), (2,'notification.type.post',1), (3,'notification.type.quote',1), (4,'notification.type.spento',0)");
+
+	// The member had chosen: private messages by e-mail yes, quotes no, and
+	// nothing at all saved for replies - where phpBB would use its defaults.
+	$db->pdo->exec("INSERT INTO phpbb_user_notifications VALUES
+		('notification.type.pm',0,5,'notification.method.email',1),
+		('notification.type.quote',0,5,'notification.method.email',0),
+		('notification.type.pm',0,5,'notification.method.board',1)");
+
+	$config = new phpbb\config\config(['mailhealth_hard_limit' => 1, 'mailhealth_soft_limit' => 5, 'mailhealth_record_period' => 90,
+		'mailhealth_action' => 1, 'mailhealth_notify_admin' => 0, 'mailhealth_confirm_days' => 30, 'num_users' => 10]);
+
+	$manager = new salvocortesiano\mailhealth\service\manager($config, $db, new phpbb\user(), new phpbb\log\log(),
+		new salvocortesiano\mailhealth\service\mh_silent_notifier(), 'b', 's', 'u',
+		'phpbb_user_notifications', 'phpbb_notification_types', '/', 'php');
+
+	$notify = function ($type, $method = 'notification.method.email') use ($db) {
+		$row = $db->pdo->query("SELECT notify FROM phpbb_user_notifications WHERE user_id=5 AND item_id=0 AND item_type='$type' AND method='$method'")->fetchColumn();
+
+		return $row === false ? null : (int) $row;
+	};
+
+	$manager->record(['email' => 'morto@example.invalid', 'type' => dsn_parser::TYPE_HARD, 'status' => '5.1.1', 'diagnostic' => 'User unknown']);
+
+	// This is the case a user reported: the address was suppressed, but a
+	// private message still produced an e-mail, because phpBB reads its own
+	// notification table and not user_notify.
+	$t->same(0, $notify('notification.type.pm'), 'la notifica e-mail dei messaggi privati viene disattivata');
+	$t->same(0, $notify('notification.type.post'), 'anche i tipi senza preferenze salvate vengono disattivati, altrimenti valgono i predefiniti');
+	$t->same(null, $notify('notification.type.spento'), 'i tipi disattivati nel forum non vengono toccati');
+	$t->same(1, $notify('notification.type.pm', 'notification.method.board'), 'le notifiche sul forum restano intatte');
+
+	$db->pdo->exec("UPDATE phpbb_users SET user_email='nuovo@gmail.com' WHERE user_id=5");
+	$manager->sync_states();
+
+	$t->same(1, $notify('notification.type.pm'), 'al cambio di indirizzo torna attivo ciò che l\'utente aveva scelto');
+	$t->same(0, $notify('notification.type.quote'), 'ciò che l\'utente aveva disattivato resta disattivato');
+	$t->same(null, $notify('notification.type.post'), 'le righe aggiunte da Mail Health vengono rimosse, non lasciate a no');
+}
+
 exit($t->summary());

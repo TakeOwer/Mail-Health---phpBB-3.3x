@@ -29,7 +29,7 @@ class diagnostics
 	 * the database - files uploaded over an enabled extension - phpBB has not
 	 * run the migrations yet and the check-up says so first thing.
 	 */
-	const SCHEMA_VERSION = '1.0.19';
+	const SCHEMA_VERSION = '1.0.26';
 
 	/** @var \phpbb\config\config */
 	protected $config;

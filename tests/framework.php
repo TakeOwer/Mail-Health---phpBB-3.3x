@@ -332,3 +332,126 @@ class mh_imap_probe extends salvocortesiano\mailhealth\service\imap_native
 	{
 	}
 }
+
+namespace phpbb\log { interface log_interface {} class log implements log_interface { public function add() {} } }
+namespace phpbb\user { }
+namespace phpbb { class user { public $data = ['user_id' => 1, 'user_email' => '']; } }
+namespace phpbb\language { class language {} class language_file_loader {} }
+namespace phpbb\routing { class helper {} }
+
+namespace phpbb\db\driver
+{
+	interface driver_interface {}
+
+	/**
+	 * Just enough of phpBB's database layer to run the manager against a real
+	 * SQLite database in memory.
+	 */
+	class mh_sqlite implements driver_interface
+	{
+		public $pdo;
+		protected $last;
+
+		public function __construct()
+		{
+			$this->pdo = new \PDO('sqlite::memory:');
+			$this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+		}
+
+		public function sql_query($query)
+		{
+			return $this->last = $this->pdo->query($query);
+		}
+
+		public function sql_query_limit($query, $limit, $offset = 0)
+		{
+			return $this->sql_query($query . ' LIMIT ' . (int) $limit . ' OFFSET ' . (int) $offset);
+		}
+
+		public function sql_fetchrow($result = null)
+		{
+			$result = $result ?: $this->last;
+
+			return $result->fetch(\PDO::FETCH_ASSOC);
+		}
+
+		public function sql_fetchrowset($result = null)
+		{
+			$result = $result ?: $this->last;
+
+			return $result->fetchAll(\PDO::FETCH_ASSOC);
+		}
+
+		public function sql_fetchfield($field, $result = null)
+		{
+			$row = $this->sql_fetchrow($result);
+
+			return $row ? $row[$field] : false;
+		}
+
+		public function sql_freeresult($result = null)
+		{
+		}
+
+		public function sql_escape($value)
+		{
+			return str_replace("'", "''", (string) $value);
+		}
+
+		public function sql_in_set($field, array $values, $negate = false)
+		{
+			$quoted = array_map(function ($value) {
+				return is_int($value) ? $value : "'" . $this->sql_escape($value) . "'";
+			}, $values);
+
+			return $field . ($negate ? ' NOT' : '') . ' IN (' . implode(',', $quoted) . ')';
+		}
+
+		public function sql_build_array($type, array $data)
+		{
+			$quoted = array_map(function ($value) {
+				if ($value === null) { return 'NULL'; }
+				if (is_bool($value)) { return (int) $value; }
+
+				return is_int($value) ? $value : "'" . $this->sql_escape((string) $value) . "'";
+			}, $data);
+
+			if ($type === 'INSERT')
+			{
+				return '(' . implode(',', array_keys($data)) . ') VALUES (' . implode(',', $quoted) . ')';
+			}
+
+			$set = [];
+
+			foreach ($data as $key => $value)
+			{
+				$set[] = $key . '=' . $quoted[$key];
+			}
+
+			return implode(', ', $set);
+		}
+	}
+}
+
+namespace salvocortesiano\mailhealth\service
+{
+	/**
+	 * Replaces the messages with nothing: this group tests what happens to
+	 * the notification settings, not what is written to the member.
+	 */
+	class mh_silent_notifier extends notifier
+	{
+		public function __construct()
+		{
+		}
+
+		public function notify_bounced(array $user_row)
+		{
+		}
+
+		public function notify_changed(array $user_row, $new_email)
+		{
+			return str_repeat('a', 32);
+		}
+	}
+}
