@@ -1,44 +1,15 @@
 Subject: Conferma il tuo indirizzo e-mail
 
-<html>
-<head>
-  <title>Le Ombre della Rete 360</title>
-</head>
-<body>
-	<p><div align="center"><a href="https://netshadows.de/ombra/"><img src="https://netshadows.de/ombra/images/banner/banner_email.jpg" alt="https://netshadows.de/ombra/" title="Le Ombre della Rete 360°" /></a></div></p>
-	<p></p>
-</body>
-</html><br /><br />
+Ciao {USERNAME},
 
-Ciao {USERNAME},<br /><br />
+Hai cambiato l'indirizzo e-mail del tuo account su {SITENAME}, dopo che il precedente aveva smesso di accettare messaggi.
 
-Hai cambiato l'indirizzo e-mail del tuo account su {SITENAME}, dopo che il precedente aveva smesso di accettare messaggi.<br /><br />
+Questo messaggio è la verifica: se lo stai leggendo, il nuovo indirizzo funziona. Fai clic sul link qui sotto per confermarlo subito:
 
-Questo messaggio è la verifica: se lo stai leggendo, il nuovo indirizzo funziona. Fai clic sul link qui sotto per confermarlo subito:<br /><br />
+{U_CONFIRM}
 
-<a href="{U_CONFIRM}">Verifica il tuo nuovo indirizzo e-mail adesso</a><br /><br />
+Se non fai nulla, l'indirizzo viene confermato da solo dopo {CONFIRM_DAYS} giorni senza problemi.
 
-Se non fai nulla, l'indirizzo viene confermato da solo dopo {CONFIRM_DAYS} giorni senza problemi.<br /><br />
+Se non hai cambiato nulla, ignora questo messaggio.
 
-Se non hai cambiato nulla, ignora questo messaggio.<br /><br />
-
-{EMAIL_SIG}<br /><br />
-
--------------------------------------<br />
-(*) Ai sensi della legge italiana 196/03, netshadows.de - Forum delle Ombre 360° è l’unico proprietario del trattamento dei tuoi dati personali per il solo scopo di soddisfare la tua richiesta.<br />
-L’utilizzo di questi dati è limitato esclusivamente al personale di netshadows.de - Forum delle Ombre 360°.<br />
-É naturalmente esclusa ogni altra comunicazione a terzi.<br /><br />
-
-NOTA : Assicurati che eventuali software AntiSpam non blocchino l’email contenente le tue istruzioni. Ti consigliamo di aggiungere questi indirizzi alla tua rubrica.<br /><br />
-
-Amministratore del forum:<br />
-founder@netshadows.de<br /><br />
-
-Informazioni sul forum:<br />
-info@netshadows.de<br /><br />
-
-Supporto tecnico del forum:<br />
-support@netshadows.de<br /><br />
-
-Contestazioni:<br />
-contenzioso@netshadows.de<br />
+{EMAIL_SIG}
